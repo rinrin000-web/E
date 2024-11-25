@@ -73,7 +73,7 @@ Route::prefix('comments')->group(function () {
 
     // Lấy chi tiết một comment
     Route::get('/user/{team_no}/{comment_user}', [CommentController::class, 'show']);
-    Route::get('/getHistory/{user}', [CommentController::class, 'getHistory']);
+    // Route::get('/getHistory/{user}', [CommentController::class, 'getHistory']);
 
     // Cập nhật comment theo team_no và id của comment
     Route::put('/{team_no}/{comment_user}', [CommentController::class, 'update']);

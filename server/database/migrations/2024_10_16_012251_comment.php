@@ -17,13 +17,13 @@ return new class extends Migration
             $table->string('comment_user'); // Trường comment_user
 
             // Các trường điểm số
-            $table->integer('rank');
-            $table->integer('present');
-            $table->integer('plan');
-            $table->integer('design');
-            $table->integer('tech');
+            $table->integer('rank')->nullable(false);
+            $table->integer('present')->nullable(false);
+            $table->integer('plan')->nullable(false);
+            $table->integer('design')->nullable(false);
+            $table->integer('tech')->nullable(false);
 
-            $table->text('comment'); // Trường comment
+            $table->text('comment')->nullable(false); // Trường comment
 
             // Định nghĩa khoá ngoại
             $table->foreign('team_no')->references('team_no')->on('teams')->onDelete('cascade');

@@ -32,7 +32,7 @@ class Kernel extends HttpKernel
      */
     protected $middlewareGroups = [
         'web' => [
-            \Illuminate\Http\Middleware\HandleCors::class,
+            // \Illuminate\Http\Middleware\HandleCors::class,
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
@@ -43,7 +43,7 @@ class Kernel extends HttpKernel
 
         'api' => [
             // \App\Http\Middleware\Cors::class,
-            \Illuminate\Http\Middleware\HandleCors::class,
+            // \Illuminate\Http\Middleware\HandleCors::class,
             // \Fruitcake\Cors\HandleCors::class,
             EnsureFrontendRequestsAreStateful::class,
             // \Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful::class,

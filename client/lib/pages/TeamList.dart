@@ -15,39 +15,41 @@ class TeamRankWidget extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    // Gọi hàm getRank và lưu kết quả
     final teamListProviderNotifier = ref.read(teamListProvider.notifier);
+    final rank = ref.watch(teamListProvider);
 
+    // Nếu rank đã có dữ liệu thì không gọi lại API
+    if (rank.isNotEmpty && rank.any((team) => team.team_no == teamNo)) {
+      final teamRank = rank.firstWhere((team) => team.team_no == teamNo);
+
+      return RatingBar.builder(
+        initialRating: teamRank.rank.toDouble(),
+        itemBuilder: (context, index) => const Icon(
+          Icons.star,
+          color: Color(0xffFD8B51),
+        ),
+        onRatingUpdate: (rating) {},
+        itemCount: 5,
+        allowHalfRating: true,
+        unratedColor: const Color.fromARGB(255, 81, 139, 187),
+        itemSize: 20,
+        ignoreGestures: true,
+      );
+    }
+
+    // Nếu chưa có dữ liệu, gọi API
     return FutureBuilder(
       future: teamListProviderNotifier.getRank(teamNo),
       builder: (context, snapshot) {
-        // if (snapshot.connectionState == ConnectionState.waiting) {
-        //   return Center(child: CircularProgressIndicator());
-        // }
-
-        // Lấy rank đã được cập nhật trong provider
-        final rank = ref.watch(teamListProvider);
-        final teamRank = rank.isNotEmpty
-            ? rank.firstWhere((team) => team.team_no == teamNo)
-            : null;
-
-        if (teamRank == null) {
-          return Center(child: Text('Rank not found.'));
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
         }
 
-        return RatingBar.builder(
-          initialRating: teamRank.rank.toDouble(),
-          itemBuilder: (context, index) => const Icon(
-            Icons.star,
-            color: Color(0xffFD8B51),
-          ),
-          onRatingUpdate: (rating) {},
-          itemCount: 5,
-          allowHalfRating: true,
-          unratedColor: const Color.fromARGB(255, 81, 139, 187),
-          itemSize: 20,
-          ignoreGestures: true,
-        );
+        if (snapshot.hasError) {
+          return Center(child: Text('Error fetching rank.'));
+        }
+
+        return Center(child: Text('Rank not found.'));
       },
     );
   }
@@ -96,7 +98,8 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
   return GestureDetector(
     onTap: () {
       ref.read(selectedTeamProvider.notifier).state = team.team_no;
-      context.go('/home/myteam');
+      context.push('/myhome/home/myteam');
+
       print(team.team_no);
     },
     child: Container(

@@ -1,7 +1,9 @@
+import 'package:client/LoginScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'provider/auth_provider.dart';
 import 'package:client/pages/LoginScreen.dart';
+import 'package:go_router/go_router.dart';
 
 class RegisterScreen extends ConsumerWidget {
   final TextEditingController emailController = TextEditingController();
@@ -95,11 +97,12 @@ class RegisterScreen extends ConsumerWidget {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('Registration successful!')),
                         );
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()),
-                        );
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => LoginScreen()),
+                        // );
+                        context.go('/login');
                       } catch (e) {
                         print('Registration error: $e');
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -123,11 +126,12 @@ class RegisterScreen extends ConsumerWidget {
                   ),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => LoginScreen()),
-                        );
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => LoginScreen()),
+                        // );
+                        context.go('/login');
                       },
                       child: Text('login'))
                 ],

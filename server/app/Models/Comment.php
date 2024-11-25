@@ -20,4 +20,9 @@ class Comment extends Model
         'comment'
     ];
     use HasFactory;
+    public function team()
+    {
+        return $this->belongsTo(Comment::class, 'team_no', 'team_no');
+    }
+
 }

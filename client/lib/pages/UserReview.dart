@@ -1,7 +1,9 @@
+import 'package:client/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/comment_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:client/provider/emailVisibility_provider.dart';
 
 class UserReview extends ConsumerStatefulWidget {
   String? teamNo;
@@ -29,6 +31,9 @@ class _UserReviewState extends ConsumerState<UserReview> {
   @override
   Widget build(BuildContext context) {
     final userReview = ref.watch(commentProvider);
+    final myuser = ref.watch(authProvider).commentUser;
+    final isPublic = ref.watch(emailVisibilityProvider);
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -63,7 +68,12 @@ class _UserReviewState extends ConsumerState<UserReview> {
                         const SizedBox(
                           width: 5,
                         ),
-                        Text("${userReview[i].comment_user}",
+                        Text(
+                            userReview[i].comment_user == myuser
+                                ? (isPublic
+                                    ? '${userReview[i].comment_user}'
+                                    : 'Euser')
+                                : '${userReview[i].comment_user}',
                             style: const TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold))
                       ],

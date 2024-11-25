@@ -19,5 +19,11 @@ class Team extends Model
     public function favorites() {
         return $this->hasMany(Favorite::class);
     }
+
+    public function comment()
+{
+    return $this->belongsTo(Comment::class, 'team_no', 'team_no');
+}
+
     use HasFactory;
 }

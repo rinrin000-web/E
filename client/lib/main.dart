@@ -1,9 +1,19 @@
 import 'package:client/pages/EventScreen.dart';
+import 'package:client/pages/FloorGuide.dart';
+import 'package:client/pages/HistoryScreen.dart';
+import 'package:client/pages/HomeScreen.dart';
+import 'package:client/pages/ItScreen.dart';
 import 'package:client/pages/LoginScreen.dart';
+import 'package:client/pages/MyHome.dart';
+import 'package:client/pages/MyTeamScreen.dart';
+import 'package:client/pages/RegisterScreen.dart';
+import 'package:client/pages/WebScreen.dart';
+import 'package:client/pages/main_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
 void main() {
   runApp(
@@ -13,13 +23,100 @@ void main() {
   );
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(authProvider).commentUser;
+    final initialLocation =
+        ref.watch(authProvider).isAuthenticated ? '/event' : '/';
+
+    final GoRouter _router = GoRouter(
+      initialLocation: initialLocation,
+      routes: [
+        GoRoute(
+          path: '/',
+          builder: (context, state) => WellcomeScreen(),
+        ),
+        GoRoute(
+          path: '/login',
+          builder: (context, state) => LoginScreen(),
+        ),
+        GoRoute(
+          path: '/signup',
+          builder: (context, state) => RegisterScreen(),
+        ),
+        GoRoute(
+          path: '/event',
+          builder: (context, state) => EventScreen(),
+        ),
+        StatefulShellRoute.indexedStack(
+          builder: (context, state, navigationShell) =>
+              Myhome(navigationShell: navigationShell),
+          branches: [
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/myhome/home',
+                  builder: (context, state) => Homescreen(),
+                  routes: [
+                    GoRoute(
+                      path: 'myteam',
+                      builder: (context, state) => MyTeamScreen(),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/myhome/it',
+                  builder: (context, state) => Itscreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/myhome/web',
+                  builder: (context, state) => WebScreen(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/myhome/floor',
+                  builder: (context, state) => Floorguide(),
+                ),
+              ],
+            ),
+            StatefulShellBranch(
+              routes: [
+                GoRoute(
+                  path: '/myhome/favorite',
+                  builder: (context, state) => HistoryScreen(
+                    user: ref.read(authProvider).commentUser,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+    return MaterialApp.router(
       debugShowCheckedModeBanner: false,
+      routerConfig: _router,
+      // initialRoute: '/wellcome',
+      // routes: {
+      //   '/wellcome': (context) => WellcomeScreen(),
+      //   '/login': (context) => LoginScreen(),
+      //   '/signup': (context) => RegisterScreen(),
+      //   '/event': (context) => EventScreen(),
+      // },
       builder: (context, child) => ResponsiveBreakpoints.builder(
         child: Container(
           decoration: const BoxDecoration(
@@ -39,8 +136,8 @@ class MyApp extends StatelessWidget {
           const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
         ],
       ),
-      // initialRoute: "/",
-      home: WellcomeScreen(),
+      // // initialRoute: "/",
+      // home: WellcomeScreen(),
     );
   }
 }
@@ -64,14 +161,13 @@ class WellcomeScreen extends ConsumerWidget {
     final authState = ref.watch(authProvider);
 
     // Nếu người dùng đã đăng nhập thì chuyển thẳng tới EventScreen
-    if (authState.isAuthenticated) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => EventScreen()),
-        );
-      });
-    }
+    // if (authState.isAuthenticated) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     // Navigator.pushNamed(context, '/login');
+    //     context.push('/login');
+    //   });
+    //   print('Auth State: ${authState.isAuthenticated}');
+    // }
 
     return Scaffold(
         backgroundColor: Colors.transparent,
@@ -96,17 +192,12 @@ class WellcomeScreen extends ConsumerWidget {
                         height: 43,
                         child: ElevatedButton(
                           onPressed: () {
-                            // Navigator.push(
-                            //   context,
-                            //   MaterialPageRoute(
-                            //       builder: (context) => LoginScreen()),
-                            // );
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
-                                  builder: (context) =>
-                                      LoginScreen()), // Thay thế WellcomeScreen
+                                  builder: (context) => LoginScreen()),
                             );
+                            // context.push('/login');
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero, // Xóa padding mặc định

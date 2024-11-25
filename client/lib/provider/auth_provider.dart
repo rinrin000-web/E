@@ -1,3 +1,4 @@
+import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
@@ -133,11 +134,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
         AuthState(isAuthenticated: state.isAuthenticated, errorMessage: null);
   }
 
-  // Hàm đăng xuất (xóa token khỏi SharedPreferences)
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token'); // Xóa token
+    await prefs.remove('token');
     await prefs.remove('commentUser');
-    state = AuthState(isAuthenticated: false);
   }
 }

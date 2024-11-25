@@ -3,6 +3,8 @@ import 'package:client/provider/comment_provider.dart';
 import 'package:client/provider/favorite_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:client/provider/team_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class HistoryScreen extends ConsumerStatefulWidget {
   final String? user;
@@ -15,14 +17,12 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   @override
   void initState() {
     super.initState();
-    ref.read(commentProvider.notifier).getHistory(widget.user);
-    // ref.read(favoriteProvider.notifier).fetchFavorite(widget.user);
+    ref.read(favoriteProvider.notifier).fetchFavorite(widget.user);
   }
 
   @override
   Widget build(BuildContext context) {
-    final history = ref.watch(commentProvider);
-    // final fa_histori = ref.watch(favoriteProvider);
+    final history = ref.watch(favoriteProvider);
 
     return Scaffold(
         backgroundColor: Colors.transparent,
@@ -30,9 +30,15 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           itemCount: history.length,
           itemBuilder: (c, i) {
             return ListTile(
-              title: Text('${history[i].team_no}'),
-              subtitle: Text('${history[i].comment}'),
-              trailing: Text('${history[i].commented_at}'),
+              title: GestureDetector(
+                onTap: () {
+                  ref.read(selectedTeamProvider.notifier).state =
+                      history[i].team_no;
+                  context.go('/myhome/home/myteam');
+                },
+                child: Text('${history[i].team_no}'),
+              ),
+              trailing: Text('${history[i].favorited_at}'),
             );
           },
         ));

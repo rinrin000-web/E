@@ -1,9 +1,11 @@
+import 'package:client/LoginScreen.dart';
 import 'package:client/pages/EventScreen.dart';
 import 'package:client/pages/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerWidget {
   final TextEditingController emailController = TextEditingController();
@@ -106,7 +108,13 @@ class LoginScreen extends ConsumerWidget {
                         await prefs.setString(
                             'token', 'user_token'); // Lưu token giả
 
-                        Navigator.pushReplacement(
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => EventScreen()),
+                        // );
+                        // context.go('/event');
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => EventScreen()),
@@ -133,7 +141,13 @@ class LoginScreen extends ConsumerWidget {
                   ),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => RegisterScreen()),
+                        // );
+                        // context.go('/signup');
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => RegisterScreen()),

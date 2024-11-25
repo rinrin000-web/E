@@ -1,3 +1,4 @@
+import 'package:client/LoginScreen.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -5,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/navigation_provider.dart.dart';
 import 'package:client/pages/search_bar.dart';
 import 'package:client/provider/search_provider.dart';
+import 'package:client/provider/emailVisibility_provider.dart';
 
 class Myhome extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -16,6 +18,8 @@ class Myhome extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(tabIndexProvider);
     final user = ref.watch(authProvider).commentUser;
+
+    final isPublic = ref.watch(emailVisibilityProvider);
 
     void _onItemTapped(int index) {
       ref.read(tabIndexProvider.notifier).setTabIndex(index);
@@ -52,24 +56,57 @@ class Myhome extends ConsumerWidget {
             const SizedBox(
               height: 10,
             ),
-            Text(
-              '$user',
-              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  isPublic ? '$user' : 'Euser',
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(width: 8),
+                IconButton(
+                  icon: Icon(
+                    isPublic ? Icons.visibility : Icons.visibility_off,
+                    color: isPublic ? Colors.green : Colors.grey,
+                    size: 30,
+                  ),
+                  onPressed: () {
+                    ref
+                        .read(emailVisibilityProvider.notifier)
+                        .toggleVisibility();
+                  },
+                ),
+              ],
             )
           ])),
           ListTile(
-            title: const Text('logout'),
+            title: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.settings),
+                SizedBox(width: 8),
+                Text('ユーザー編集'),
+              ],
+            ),
             onTap: () {
-              ref.read(authProvider.notifier).logout();
               Navigator.pop(context);
             },
           ),
           ListTile(
-            title: const Text('item2'),
+            title: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Icon(Icons.logout),
+                SizedBox(width: 8),
+                Text('ログアウト'),
+              ],
+            ),
             onTap: () {
-              Navigator.pop(context);
+              ref.read(authProvider.notifier).logout();
+              context.go('/');
             },
-          )
+          ),
         ],
       ),
     );
@@ -78,6 +115,7 @@ class Myhome extends ConsumerWidget {
       key: scaffoldKey,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         flexibleSpace: Padding(
           padding: const EdgeInsets.all(0.0),
           child: appbar,
@@ -123,8 +161,8 @@ class Myhome extends ConsumerWidget {
             backgroundColor: Color(0xffFFCC66),
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.history),
-            label: 'History',
+            icon: Icon(Icons.favorite_border),
+            label: 'Favorite',
             backgroundColor: Color(0xffFFCC66),
           ),
         ],

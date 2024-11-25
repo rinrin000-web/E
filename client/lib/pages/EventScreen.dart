@@ -1,8 +1,10 @@
 import 'package:client/pages/HomeScreen.dart';
+import 'package:client/pages/MyHome.dart';
 import 'package:client/pages/main_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class EventScreen extends ConsumerWidget {
   final images = Image.asset('assets/images/eventImage.png');
@@ -17,10 +19,15 @@ class EventScreen extends ConsumerWidget {
         // child: SizedBox(
         child: ElevatedButton(
             onPressed: () {
-              Navigator.pushReplacement(
-                context,
-                MaterialPageRoute(builder: (context) => MainHome()),
-              );
+              // Navigator.pushReplacement(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => MainHome()),
+              // );
+              context.push('/myhome/home');
+              // Navigator.push(
+              //   context,
+              //   MaterialPageRoute(builder: (context) => Myhome()),
+              // );
             },
             style: ElevatedButton.styleFrom(
               padding: EdgeInsets.zero, // Xóa khoảng cách padding mặc định

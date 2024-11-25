@@ -15,9 +15,11 @@ class CommentController extends Controller
 
 
      //新規作成
-     public function store(Request $request){
+     public function store(Request $request)
+{
+    try {
         $validatedData = $request->validate([
-            'team_no'=>'required|string',
+            'team_no' => 'required|string',
             'comment_user' => 'required|string',
             'rank' => 'nullable|integer',
             'present' => 'nullable|integer',
@@ -29,9 +31,14 @@ class CommentController extends Controller
 
         $comment = new Comment();
         $comment->fill($validatedData);
-        $comment ->save();
+        $comment->save();
+
         return response()->json($comment, 201);
-      }
+    } catch (\Exception $e) {
+        return response()->json(['error' => $e->getMessage()], 500);
+    }
+}
+
 
      //1件取得
     //  public function show($comment_user){

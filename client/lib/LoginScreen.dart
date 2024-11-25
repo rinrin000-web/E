@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'provider/auth_provider.dart';
+import 'package:go_router/go_router.dart';
 
 class LoginScreen extends ConsumerWidget {
   final TextEditingController emailController = TextEditingController();
@@ -27,7 +28,15 @@ class LoginScreen extends ConsumerWidget {
     // Lấy trạng thái lỗi từ provider
     final errorMessage =
         ref.watch(authProvider.select((state) => state.errorMessage));
+    // final authState = ref.watch(authProvider); // Lấy trạng thái đăng nhập
 
+    // // Nếu đã đăng nhập, chuyển đến màn hình chính
+    // if (authState.isAuthenticated) {
+    //   WidgetsBinding.instance.addPostFrameCallback((_) {
+    //     Navigator.pushReplacementNamed(
+    //         context, '/event'); // Chuyển đến EventScreen
+    //   });
+    // }
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -106,7 +115,9 @@ class LoginScreen extends ConsumerWidget {
                         await prefs.setString(
                             'token', 'user_token'); // Lưu token giả
 
-                        Navigator.pushReplacement(
+                        // Navigator.pushReplacementNamed(context, '/event');
+                        // context.push('/event');
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
                               builder: (context) => EventScreen()),
@@ -133,11 +144,8 @@ class LoginScreen extends ConsumerWidget {
                   ),
                   TextButton(
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => RegisterScreen()),
-                        );
+                        // Navigator.pushReplacementNamed(context, '/signup');
+                        context.push('/signup');
                       },
                       child: Text('signup'))
                 ],

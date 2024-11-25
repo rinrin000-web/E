@@ -56,21 +56,22 @@ class CommentScreen extends ConsumerWidget {
                     final designRating = int.tryParse(designController.text);
                     final techRating = int.tryParse(techController.text);
 
-                    if (comment.rank == null ||
-                        comment.present == null ||
-                        comment.plan == null ||
-                        comment.design == null ||
-                        comment.tech == null ||
-                        comment.comment == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                              'すべてのフィールドに入力してください！'), // Thông báo lỗi "Hãy điền tất cả các trường"
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
-                      return;
-                    }
+                    // if (comment.rank == null ||
+                    //     comment.present == null ||
+                    //     comment.plan == null ||
+                    //     comment.design == null ||
+                    //     comment.tech == null ||
+                    //     comment.comment == null ||
+                    //     comment.comment!.isEmpty) {
+                    //   ScaffoldMessenger.of(context).showSnackBar(
+                    //     const SnackBar(
+                    //       content: Text(
+                    //           'すべてのフィールドに入力してください！'), // Thông báo lỗi "Hãy điền tất cả các trường"
+                    //       duration: Duration(seconds: 2),
+                    //     ),
+                    //   );
+                    //   return;
+                    // }
                     if ([presentRating, planRating, designRating, techRating]
                         .any((rating) => rating != null && rating > 5)) {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -109,40 +110,39 @@ class CommentScreen extends ConsumerWidget {
                           .read(teamListProvider.notifier)
                           .getRank(comment.team_no);
                     }
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            Image.asset(
+                              'images/echan.png',
+                              width: 50,
+                              height: 50,
+                            ),
+                            const SizedBox(width: 8),
+                            const Text(
+                              '保存しました!',
+                              style: TextStyle(
+                                color: Colors.black87,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: const Color(0xffF2E5BF),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        margin: const EdgeInsets.all(10),
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
                   } catch (e) {
                     ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(content: Text('Error: ${e.toString()}')));
                   }
-
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Row(
-                        children: [
-                          Image.asset(
-                            'images/echan.png',
-                            width: 50,
-                            height: 50,
-                          ),
-                          const SizedBox(width: 8),
-                          const Text(
-                            '保存しました!',
-                            style: TextStyle(
-                              color: Colors.black87,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      backgroundColor: const Color(0xffF2E5BF),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      margin: const EdgeInsets.all(10),
-                      duration: const Duration(seconds: 2),
-                    ),
-                  );
                 }
 
                 return SizedBox(

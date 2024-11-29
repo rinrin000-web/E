@@ -21,6 +21,7 @@ return new class extends Migration
 
             // Định nghĩa khóa ngoại
             $table->foreign('floor_no')->references('floor_no')->on('floors')->onDelete('cascade');
+            $table->foreign('team_no')->references('team_no')->on('events')->onDelete('cascade');
     });
 }
 

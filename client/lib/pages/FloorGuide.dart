@@ -1,3 +1,4 @@
+import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/floor_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -12,12 +13,19 @@ class _FloorguideState extends ConsumerState<Floorguide> {
   late List<int> teamCounts;
   late List<int> userCounts;
 
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   // Chỉ gọi fetchFloor một lần khi widget khởi tạo
+  //   // Future.microtask(() =>
+  //   ref.read(floorProvider.notifier).fetchFloor();
+  // }
   @override
-  void initState() {
-    super.initState();
-    // Chỉ gọi fetchFloor một lần khi widget khởi tạo
-    // Future.microtask(() =>
-    ref.read(floorProvider.notifier).fetchFloor();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+    print('eventId: $eventId');
+    ref.read(floorProvider.notifier).fetchFloor(eventId);
   }
 
   @override
@@ -27,7 +35,7 @@ class _FloorguideState extends ConsumerState<Floorguide> {
 
     userCounts = floor.map((f) => f.userCount).toList();
 
-    floor.sort((a, b) => b.floor_no.compareTo(a.floor_no));
+    // floor.sort((a, b) => b.floor_no.compareTo(a.floor_no));
 
     final text1 = Text('参加者');
     final text2 = Text('チーム');

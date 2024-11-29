@@ -28,9 +28,10 @@ class Floor {
 class FloorNotifier extends StateNotifier<List<Floor>> {
   FloorNotifier() : super([]);
   final String baseUrl = 'http://127.0.0.1:8000/api/floors';
-  Future<void> fetchFloor() async {
+  Future<void> fetchFloor(int? eventId) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl'));
+      final response =
+          await http.get(Uri.parse('$baseUrl/getFloorTeamCount/$eventId'));
 
       if (response.statusCode == 200) {
         List<dynamic> body = json.decode(response.body);

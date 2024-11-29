@@ -1,4 +1,5 @@
 import 'package:client/pages/TeamList.dart';
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/team_provider.dart';
@@ -11,11 +12,18 @@ class WebScreen extends ConsumerStatefulWidget {
 }
 
 class _WebScreenState extends ConsumerState<WebScreen> {
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+  //   ref.read(teamListProvider.notifier).fetchTeamsbyId(eventId);
+  // }
+
   @override
-  void initState() {
-    super.initState();
-    // Gọi API khi widget khởi tạo
-    ref.read(teamListProvider.notifier).fetchTeams();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+    ref.read(teamListProvider.notifier).fetchTeamsbyId(eventId);
   }
 
   @override

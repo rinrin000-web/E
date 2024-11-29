@@ -1,3 +1,4 @@
+import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -5,7 +6,9 @@ import 'package:client/provider/floor_provider.dart';
 
 class CurrentfloorCheck extends ConsumerStatefulWidget {
   final String? user;
-  const CurrentfloorCheck({Key? key, required this.user}) : super(key: key);
+  final int? eventId;
+  const CurrentfloorCheck({Key? key, required this.user, required this.eventId})
+      : super(key: key);
 
   @override
   _CurrentfloorCheckState createState() => _CurrentfloorCheckState();
@@ -17,7 +20,8 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
   @override
   void initState() {
     super.initState();
-    ref.read(floorProvider.notifier).fetchFloor();
+    final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
+    ref.read(floorProvider.notifier).fetchFloor(eventId);
     ref.read(userLocationProvider.notifier).fetchUserLocation(widget.user);
   }
 
@@ -28,7 +32,8 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
     await ref
         .read(userLocationProvider.notifier)
         .updateUserLocation(widget.user!, floorNo);
-    await ref.read(floorProvider.notifier).fetchFloor();
+    final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
+    await ref.read(floorProvider.notifier).fetchFloor(eventId);
   }
 
   @override

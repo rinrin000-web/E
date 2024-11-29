@@ -21,6 +21,11 @@ class TeamList {
       image: 'http://127.0.0.1:8000/api/teams/image/${json['teamfileimages']}',
     );
   }
+
+  @override
+  String toString() {
+    return 'TeamList(team_no: $team_no, floor: $floor, rank: $rank)';
+  }
 }
 
 // Provider lưu trữ team_no của đội được chọn
@@ -29,15 +34,41 @@ final selectedTeamProvider = StateProvider<String?>((ref) => null);
 class TeamNotifier extends StateNotifier<List<TeamList>> {
   TeamNotifier() : super([]);
 
-  Future<void> fetchTeams() async {
+  // Future<void> fetchTeams() async {
+  //   try {
+  //     final response =
+  //         await http.get(Uri.parse('http://127.0.0.1:8000/api/teams'));
+
+  //     if (response.statusCode == 200) {
+  //       final List<dynamic> data = json.decode(response.body);
+  //       state = data.map((json) => TeamList.fromJson(json)).toList();
+  //       print(state);
+  //     } else {
+  //       print('Error: ${response.statusCode}, ${response.body}');
+  //       throw Exception('Failed to load teams');
+  //     }
+  //   } catch (e) {
+  //     print('Error occurred: $e');
+  //     throw Exception('Failed to load teams');
+  //   }
+  // }
+  Future<void> fetchTeamsbyId(int? id) async {
     try {
-      final response =
-          await http.get(Uri.parse('http://127.0.0.1:8000/api/teams'));
+      final response = await http
+          .get(Uri.parse('http://127.0.0.1:8000/api/teams/events/$id'));
 
       if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        state = data.map((json) => TeamList.fromJson(json)).toList();
-        print(state);
+        final Map<String, dynamic> data = json.decode(response.body);
+
+        // Kiểm tra xem 'teams' có tồn tại trong dữ liệu không
+        if (data.containsKey('teams')) {
+          final List<dynamic> teamsData = data['teams'];
+          state = teamsData.map((json) => TeamList.fromJson(json)).toList();
+          print(state);
+        } else {
+          print('Không tìm thấy dữ liệu teams trong phản hồi');
+          throw Exception('No teams found in the response');
+        }
       } else {
         print('Error: ${response.statusCode}, ${response.body}');
         throw Exception('Failed to load teams');
@@ -48,9 +79,10 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     }
   }
 
-  void searchByTeamNo(String teamNo) {
+  void searchByTeamNo(String teamNo, int? id) {
     if (teamNo.isEmpty) {
-      fetchTeams();
+      // fetchTeams();
+      fetchTeamsbyId(id);
     } else {
       state = state
           .where((team) => team.team_no?.contains(teamNo) ?? false)
@@ -58,11 +90,11 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     }
   }
 
-  Future<void> getRank(String? teamNo) async {
+  Future<void> getRank(String? teamNo, int? id) async {
     try {
       // Send the request to the API
-      final response = await http
-          .get(Uri.parse('http://127.0.0.1:8000/api/teams/getRank/$teamNo'));
+      final response = await http.get(
+          Uri.parse('http://127.0.0.1:8000/api/teams/getRank/$teamNo/$id'));
 
       // Log the response body for debugging
       print('API Response: ${response.body}');
@@ -87,7 +119,6 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
 
             // Đặt lại state để cập nhật UI
             state = List.from(state);
-
             print('State after update: ${state[teamIndex]}');
           } else {
             print('Rank không thay đổi, không cần cập nhật state');

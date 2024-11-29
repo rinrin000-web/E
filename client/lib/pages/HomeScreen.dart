@@ -1,3 +1,4 @@
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -15,17 +16,25 @@ class Homescreen extends ConsumerStatefulWidget {
 }
 
 class _HomescreenState extends ConsumerState<Homescreen> {
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+  //   ref.read(teamListProvider.notifier).fetchTeamsbyId(eventId);
+  // }
   @override
-  void initState() {
-    super.initState();
-    // Gọi API khi widget khởi tạo
-    ref.read(teamListProvider.notifier).fetchTeams();
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+    print('eventId: $eventId');
+    ref.read(teamListProvider.notifier).fetchTeamsbyId(eventId);
   }
 
   @override
   Widget build(BuildContext context) {
     final teams = ref.watch(teamListProvider);
     final user = ref.watch(authProvider).commentUser;
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
     final list = ListView.builder(
       itemCount: teams.length,
       itemBuilder: (c, i) {
@@ -57,6 +66,7 @@ class _HomescreenState extends ConsumerState<Homescreen> {
                     ),
                     CurrentfloorCheck(
                       user: user,
+                      eventId: eventId,
                     )
                   ],
                 ))

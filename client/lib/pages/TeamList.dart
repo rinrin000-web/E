@@ -1,5 +1,6 @@
 import 'package:client/pages/TeamFavoriteWidget.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // Dùng để parse JSON
@@ -10,14 +11,18 @@ import 'package:client/provider/team_provider.dart';
 
 class TeamRankWidget extends ConsumerWidget {
   final String? teamNo;
+  final int? eventId;
 
-  TeamRankWidget({required this.teamNo});
+  TeamRankWidget({required this.teamNo, required this.eventId});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final teamListProviderNotifier = ref.read(teamListProvider.notifier);
     final rank = ref.watch(teamListProvider);
 
+    // if (rank.isNotEmpty) {
+    //   rank.sort((a, b) => b.rank.compareTo(a.rank)); // Sắp xếp giảm dần
+    // }
     // Nếu rank đã có dữ liệu thì không gọi lại API
     if (rank.isNotEmpty && rank.any((team) => team.team_no == teamNo)) {
       final teamRank = rank.firstWhere((team) => team.team_no == teamNo);
@@ -39,7 +44,7 @@ class TeamRankWidget extends ConsumerWidget {
 
     // Nếu chưa có dữ liệu, gọi API
     return FutureBuilder(
-      future: teamListProviderNotifier.getRank(teamNo),
+      future: teamListProviderNotifier.getRank(teamNo, eventId),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Center(child: CircularProgressIndicator());
@@ -64,7 +69,10 @@ class TeamRankWidget extends ConsumerWidget {
 // モデル => ウィジェット に変換する
 Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
   final user = ref.read(authProvider).commentUser;
+  final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
+  print("evenId : ${eventId}");
   final text = Text('${team.floor}');
+
   // final icon_rank = RatingBar.builder(
   //   itemBuilder: (context, index) => const Icon(
   //     Icons.star,
@@ -114,7 +122,7 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
               Row(
                 children: [
                   text,
-                  TeamRankWidget(teamNo: team.team_no),
+                  TeamRankWidget(teamNo: team.team_no, eventId: eventId),
                 ],
               ),
               TeamFavoriteWidget(userEmail: user, teamNo: team.team_no)

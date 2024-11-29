@@ -1,5 +1,6 @@
 import 'package:client/LoginScreen.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -17,6 +18,7 @@ class Myhome extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final selectedIndex = ref.watch(tabIndexProvider);
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
     final user = ref.watch(authProvider).commentUser;
 
     final isPublic = ref.watch(emailVisibilityProvider);
@@ -39,7 +41,7 @@ class Myhome extends ConsumerWidget {
       width: double.infinity * 0.8,
       color: const Color(0xffC0E2E3),
       child: Row(
-        children: [logoImage, const Spacer(), Searchbar()],
+        children: [logoImage, const Spacer(), Searchbar(eventId: eventId)],
       ),
     );
 

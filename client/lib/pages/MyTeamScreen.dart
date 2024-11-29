@@ -5,6 +5,7 @@ import 'package:client/pages/OverviewScreen.dart';
 import 'package:client/pages/TeamList.dart';
 import 'package:client/pages/UserReview.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/team_provider.dart';
@@ -24,6 +25,8 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
   Widget build(BuildContext context) {
     final selectedTeamNo = ref.watch(selectedTeamProvider);
     final user = ref.watch(authProvider).commentUser;
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+
     print('commentuser: $user');
     final teams = ref.watch(teamListProvider);
     final selectedTeam = teams.firstWhere(
@@ -66,7 +69,10 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
             //   itemSize: 20,
             //   ignoreGestures: true,
             // ));
-            TeamRankWidget(teamNo: selectedTeamNo));
+            TeamRankWidget(
+          teamNo: selectedTeamNo,
+          eventId: eventId,
+        ));
 
     final row = Row(
       children: [Text(selectedTeam.floor), icon_rank],

@@ -1,10 +1,12 @@
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:client/provider/search_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/team_provider.dart';
 
 class Searchbar extends ConsumerStatefulWidget {
-  const Searchbar({super.key});
+  final int? eventId;
+  const Searchbar({super.key, required this.eventId});
 
   @override
   ConsumerState<Searchbar> createState() => _SearchbarState();
@@ -29,6 +31,7 @@ class _SearchbarState extends ConsumerState<Searchbar> {
   @override
   Widget build(BuildContext context) {
     final searchQuery = ref.watch(searchProvider);
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
 
     return Center(
       child: Container(
@@ -57,7 +60,10 @@ class _SearchbarState extends ConsumerState<Searchbar> {
               icon: Icon(Icons.clear, color: Colors.black26),
               onPressed: () {
                 _controller.clear();
-                ref.read(teamListProvider.notifier).fetchTeams();
+                ref.read(searchProvider.notifier).updateQuery('');
+                ref
+                    .read(teamListProvider.notifier)
+                    .fetchTeamsbyId(widget.eventId);
               },
             ),
             contentPadding:
@@ -67,7 +73,9 @@ class _SearchbarState extends ConsumerState<Searchbar> {
           onChanged: (query) {
             print('Search query submitted: $query');
             ref.read(searchProvider.notifier).updateQuery(query);
-            ref.read(teamListProvider.notifier).searchByTeamNo(query);
+            ref
+                .read(teamListProvider.notifier)
+                .searchByTeamNo(query, widget.eventId);
           },
         ),
       ),

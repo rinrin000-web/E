@@ -10,6 +10,8 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\OverviewController;
 use App\Http\Controllers\UserLocationController;
 use App\Http\Controllers\FavoriteController;
+use App\Http\Controllers\EventController;
+use App\Http\Controllers\EventManageController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,12 +49,13 @@ Route::middleware('auth:api')->group(function(){
 Route::get('/user/user', [UserController::class, 'index']);
 
 Route::get('/teams/{team_no?}', [TeamController::class, 'index']);
+Route::get('/teams/events/{id}', [TeamController::class, 'getTeamsByEventId']);
 Route::get('/teams/image/{filename}', [TeamController::class, 'getImage']);
 Route::post('/teams/update-image/{team_no}', [TeamController::class, 'updateTeamImage']);
-Route::get('/teams/getRank/{team_no}', [TeamController::class, 'getRank']);
+Route::get('/teams/getRank/{team_no}/{event_id}', [TeamController::class, 'getRank']);
 
 Route::post('/floors/{floor_no}', [FloorController::class, 'store']);
-Route::get('/floors', [FloorController::class, 'index']);
+Route::get('/floors/getFloorTeamCount/{event_id}', [FloorController::class, 'getFloorTeamCount']);
 
 Route::get('/user/location/{email?}', [UserLocationController::class, 'show']);
 Route::put('/user/location/{email}', [UserLocationController::class, 'update']);
@@ -85,7 +88,6 @@ Route::prefix('comments')->group(function () {
 Route::prefix('overviews')->group(function () {
     // Lấy danh sách các comment, có thể lọc theo team_no
     Route::get('/{team_no?}', [OverviewController::class, 'index']);
-
     // Tạo mới comment
     Route::post('/', [OverviewController::class, 'store']);
 
@@ -104,5 +106,27 @@ Route::prefix('favorite')->group(function () {
     Route::delete('/{user_email}/{team_no}', [FavoriteController::class, 'destroy']);
 });
 
+Route::prefix('events')->group(function () {
+    // Lấy danh sách các comment, có thể lọc theo team_no
+    Route::get('/', [EventController::class, 'index']);
+
+    // Tạo mới comment
+    Route::post('/', [EventController::class, 'store']);
+
+    Route::put('/{id}', [EventController::class, 'update']);
+    Route::post('/updateTeamImage/{id}', [EventController::class, 'updateTeamImage']);
+    Route::get('/eventimages/{filename}', [EventController::class, 'getImage']);
+    // Route::get('/{eventName}', [EventController::class, 'getFirstImageByEventName']);
+
+    // Cập nhật comment theo team_no và id của comment
+    Route::delete('/{id}', [EventController::class, 'destroy']);
+});
+Route::prefix('eventsmanage')->group(function () {
+
+    Route::get('/', [EventManageController::class, 'index']);
+    Route::post('/', [EventManageController::class, 'store']);
+    // Route::put('/{id}', [EventController::class, 'update']);
+    Route::delete('/{team_no}/{event_id}', [EventManageController::class, 'destroy']);
+});
 
 // Route::get('/overview/{team_no?}', [OverviewController::class, 'index']);

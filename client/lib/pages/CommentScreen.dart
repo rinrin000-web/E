@@ -1,3 +1,4 @@
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/comment_provider.dart';
@@ -13,6 +14,8 @@ class CommentScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+
     return SingleChildScrollView(
       child: SizedBox(
         height: 500,
@@ -101,14 +104,14 @@ class CommentScreen extends ConsumerWidget {
                           updatedComment);
                       await ref
                           .read(teamListProvider.notifier)
-                          .getRank(comment.team_no);
+                          .getRank(comment.team_no, eventId);
                     } else {
                       await ref
                           .read(commentProvider.notifier)
                           .createComment(updatedComment);
                       await ref
                           .read(teamListProvider.notifier)
-                          .getRank(comment.team_no);
+                          .getRank(comment.team_no, eventId);
                     }
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(

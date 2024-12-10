@@ -12,7 +12,7 @@ class EventController extends Controller
     // Lấy danh sách tất cả sự kiện
     public function index()
     {
-        return response()->json(Event::all());
+        return response()->json(Event::all(), 200, [], JSON_PRETTY_PRINT);
     }
 
     // Tạo mới một sự kiện
@@ -112,9 +112,9 @@ class EventController extends Controller
 
 
     // Xóa sự kiện
-    public function destroy($eventName)
+    public function destroy($eventId)
     {
-        $event = Event::where('event_name', $eventName)->first();
+        $event = Event::where('id', $eventId)->first();
 
         if (!$event) {
             return response()->json(['message' => 'Event not found'], 404);

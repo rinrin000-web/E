@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:client/provider/auth_provider.dart';
+import 'package:flutter/foundation.dart';
 
 class MemberImages {
   final int id;
@@ -44,6 +45,34 @@ class MemberImagesNotifier extends StateNotifier<List<MemberImages>> {
     } catch (e) {
       print('Error occurred: $e');
       throw Exception('Failed to load teams');
+    }
+  }
+
+  Future<void> updateImages(
+      String? teamNo, List<Uint8List> imageBytesList) async {
+    for (var imageBytes in imageBytesList) {
+      try {
+        var request = http.MultipartRequest(
+            'POST',
+            Uri.parse(
+                'http://127.0.0.1:8000/api/memberfileimages/update-image/$teamNo'));
+
+        request.files.add(http.MultipartFile.fromBytes(
+            'memberfileimages', imageBytes,
+            filename: 'member_image.jpg'));
+
+        var response = await request.send();
+
+        if (response.statusCode == 201) {
+          var responseData = await response.stream.bytesToString();
+          var data = json.decode(responseData);
+          print(data);
+        } else {
+          print('Failed to post data: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error posting data: $e');
+      }
     }
   }
 }

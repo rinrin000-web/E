@@ -53,6 +53,29 @@ class UserLocationNotifier extends StateNotifier<List<User>> {
       throw Exception('Failed to update user');
     }
   }
+
+  Future<void> clearUserLocation(String? email) async {
+    final response = await http.put(
+      Uri.parse('$baseUrl/$email'),
+      headers: {'Content-Type': 'application/json; charset=UTF-8'},
+      body: jsonEncode({
+        'floor_no': null, // Xóa tầng bằng cách gán null
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      state = state.map((user) {
+        if (user.email == email) {
+          return User(email: user.email, floor_no: null);
+        }
+        return user;
+      }).toList();
+
+      print('User location cleared for $email');
+    } else {
+      throw Exception('Failed to clear user location');
+    }
+  }
 }
 
 final userLocationProvider =

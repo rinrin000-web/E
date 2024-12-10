@@ -11,8 +11,8 @@ class Eventsmange extends Model
     protected $primaryKey = 'id';
     protected $fillable = ['event_id','team_no'];
     use HasFactory;
-    public function event()
+    public function events()
     {
-        return $this->belongsTo(Event::class, 'id','event_id');
+        return $this->belongsTo(Event::class, 'event_id', 'id');
     }
 }

@@ -27,6 +27,8 @@ class _EventScreenState extends ConsumerState<EventScreen> {
   @override
   Widget build(BuildContext context) {
     final event_images = ref.watch(eventProvider);
+    final user = ref.watch(authProvider).commentUser;
+
     if (event_images.isEmpty) {
       return Center(child: CircularProgressIndicator());
     }
@@ -93,42 +95,69 @@ class _EventScreenState extends ConsumerState<EventScreen> {
       },
     );
     return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Container(
-          height: MediaQuery.of(context).size.height,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              carousel,
-              const SizedBox(height: 20),
-              circle_list,
-            ],
-          ),
-        )
-        // Container(
-        //   padding: EdgeInsets.all(15),
-        //   alignment: Alignment.center,
-        //   // child: SizedBox(
-        //   child: ElevatedButton(
-        //       onPressed: () {
-        //         // Navigator.pushReplacement(
-        //         //   context,
-        //         //   MaterialPageRoute(builder: (context) => MainHome()),
-        //         // );
-        //         context.push('/myhome/home');
-        //         // Navigator.push(
-        //         //   context,
-        //         //   MaterialPageRoute(builder: (context) => Myhome()),
-        //         // );
-        //       },
-        //       style: ElevatedButton.styleFrom(
-        //         padding: EdgeInsets.zero, // Xóa khoảng cách padding mặc định
-        //         minimumSize: Size(0, 0), // Không đặt kích thước tối thiểu
-        //       ),
-        //       child: images),
-        //   // )
-        // ),
-        );
+      backgroundColor: Colors.transparent,
+      body: Container(
+        height: MediaQuery.of(context).size.height,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            carousel,
+            const SizedBox(height: 20),
+            circle_list,
+            const SizedBox(height: 20),
+            IconButton(
+                icon: const Icon(
+                  Icons.delete,
+                  size: 30,
+                  color: Colors.red,
+                ),
+                onPressed: () {
+                  ref
+                      .read(eventProvider.notifier)
+                      .deleteEvent(event_images[selectedIndex].id);
+                }),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          // context.go('/myhome/home/newEvents');
+        },
+        child: user == "admin@gmail.com"
+            ? IconButton(
+                onPressed: () {
+                  context.go('/newEvents');
+                },
+                icon: const Icon(
+                  Icons.add,
+                ))
+            : null,
+      ),
+
+      // Container(
+      //   padding: EdgeInsets.all(15),
+      //   alignment: Alignment.center,
+      //   // child: SizedBox(
+      //   child: ElevatedButton(
+      //       onPressed: () {
+      //         // Navigator.pushReplacement(
+      //         //   context,
+      //         //   MaterialPageRoute(builder: (context) => MainHome()),
+      //         // );
+      //         context.push('/myhome/home');
+      //         // Navigator.push(
+      //         //   context,
+      //         //   MaterialPageRoute(builder: (context) => Myhome()),
+      //         // );
+      //       },
+      //       style: ElevatedButton.styleFrom(
+      //         padding: EdgeInsets.zero, // Xóa khoảng cách padding mặc định
+      //         minimumSize: Size(0, 0), // Không đặt kích thước tối thiểu
+      //       ),
+      //       child: images),
+      //   // )
+      // ),
+    );
   }
 }

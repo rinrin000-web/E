@@ -12,48 +12,48 @@ class FloorController extends Controller
     /**
      * Handle the incoming request.
      */
-    public function store(Request $request, $floor_no)
+    public function store(Request $request)
     {
         // Validate dữ liệu từ yêu cầu API
         $request->validate([
-            'contents' => 'required|string|max:255',
+            'contents' => 'required|string|max:255', // Nội dung là bắt buộc và tối đa 255 ký tự
         ]);
 
-         // Tìm bản ghi floor dựa trên floor_no
-         $floor = Floor::where('floor_no', $floor_no)->first();
-
-         // Kiểm tra xem floor có tồn tại không
-         if (!$floor) {
-             return response()->json([
-                 'message' => 'Floor not found.'
-             ], 404);
-         }
-        $floor->contents = $request->contents; // Gán nội dung từ API
-        $floor->save(); // Lưu vào database
+        // Tạo một tầng mới
+        $floor = new Floor();
+        $floor->floor_no = $request->floor_no; // Gán nội dung từ yêu cầu
+        $floor->contents = $request->contents; // Gán nội dung từ yêu cầu
+        $floor->save(); // Lưu tầng mới vào cơ sở dữ liệu
 
         // Trả về phản hồi JSON
         return response()->json([
-            'message' => 'Floor content inserted successfully!',
+            'message' => 'New floor created successfully!',
             'data' => $floor,
         ], 201);
     }
-    // public function index()
-    // {
-    //     $floor = Floor::all();
-    //     return response()->json($floor);
-    // }
-    // public function index()
-    // {
-    //     $floors = Floor::all();
 
-    //     foreach ($floors as $floor) {
+    public function update(Request $request, $floor_no) {
+        $floor = Floor::where('floor_no', $floor_no)->first();
 
-    //         $floor->teamcount = $floor->teams()->count();
-    //         $floor->userCount = $floor->users()->count();
-    //     }
+        if (!$floor) {
+            return response()->json([
+                'message' => 'Floor not found.'
+            ], 404); // HTTP 404 Not Found
+        }
 
-    //     return response()->json($floors);
-    // }
+        $floor->update($request->all());
+        return response()->json($floor);
+    }
+
+    public function destroy($floor_no){
+        $floor = Floor::where('floor_no',$floor_no)->first();
+
+        if(!$floor){
+            return response()->json(['message' =>'floor not found '],400);
+        }
+        $floor->delete();
+        return response()->json(['message' =>'floor_no delete successfully','data'=> $floor],200);
+    }
     public function getFloorTeamCount($event_id)
 {
     $floors = Floor::all(); // Lấy tất cả các tầng

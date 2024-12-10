@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class Floor extends Model
 {
     protected $table = 'floors';
-    protected $primaryKey = 'floor_no';
+    protected $primaryKey = 'id';
     protected $fillable = ['floor_no','contents'];
     use HasFactory;
     public function teams()

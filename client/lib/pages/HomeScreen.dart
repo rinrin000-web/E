@@ -1,3 +1,4 @@
+import 'package:client/pages/createTeams.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -48,31 +49,44 @@ class _HomescreenState extends ConsumerState<Homescreen> {
       height: 80,
       fit: BoxFit.contain,
     );
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(10.0),
-        height: MediaQuery.of(context).size.height,
-        child: Stack(
-          children: [
-            list,
-            Positioned(
-                bottom: 10,
-                // right: 10,
-                child: Row(
-                  children: [
-                    echan,
-                    const SizedBox(
-                      width: 10,
-                    ),
-                    CurrentfloorCheck(
-                      user: user,
-                      eventId: eventId,
-                    )
-                  ],
-                ))
-          ],
+    return Scaffold(
+        backgroundColor: Colors.transparent,
+        body: Container(
+          padding: const EdgeInsets.all(10.0),
+          height: MediaQuery.of(context).size.height,
+          child: Stack(
+            children: [
+              list,
+              Positioned(
+                  bottom: 10,
+                  // right: 10,
+                  child: Row(
+                    children: [
+                      echan,
+                      const SizedBox(
+                        width: 10,
+                      ),
+                      CurrentfloorCheck(
+                        user: user,
+                        eventId: eventId,
+                      )
+                    ],
+                  ))
+            ],
+          ),
         ),
-      ),
-    );
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: user == 'admin@gmail.com'
+              ? IconButton(
+                  onPressed: () {
+                    context.go('/myhome/home/newTeams');
+                  },
+                  icon: const Icon(
+                    Icons.add,
+                    size: 30,
+                  ))
+              : null,
+        ));
   }
 }

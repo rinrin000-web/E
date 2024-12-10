@@ -1,6 +1,7 @@
 import 'package:client/LoginScreen.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:client/provider/event_provider.dart';
+import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -23,12 +24,35 @@ class Myhome extends ConsumerWidget {
 
     final isPublic = ref.watch(emailVisibilityProvider);
 
+    // void _onItemTapped(int index) {
+    //   ref.read(tabIndexProvider.notifier).setTabIndex(index);
+    //   if (index == 0) {
+    //     navigationShell.goBranch(index, initialLocation: true);
+    //   } else {
+    //     navigationShell.goBranch(index);
+    //   }
+    // }
     void _onItemTapped(int index) {
-      ref.read(tabIndexProvider.notifier).setTabIndex(index);
-      if (index == 0) {
-        navigationShell.goBranch(index, initialLocation: true);
-      } else {
-        navigationShell.goBranch(index);
+      ref.read(tabIndexProvider.notifier).setTabIndex(index); // Cập nhật tab
+      // Điều hướng đến trang tương ứng dựa trên index
+      switch (index) {
+        case 0:
+          context.go('/myhome/home');
+          break;
+        case 1:
+          context.go('/myhome/it');
+          break;
+        case 2:
+          context.go('/myhome/web');
+          break;
+        case 3:
+          context.go('/myhome/floor');
+          break;
+        case 4:
+          context.go('/myhome/favorite');
+          break;
+        default:
+          break;
       }
     }
 
@@ -70,7 +94,7 @@ class Myhome extends ConsumerWidget {
                 IconButton(
                   icon: Icon(
                     isPublic ? Icons.visibility : Icons.visibility_off,
-                    color: isPublic ? Colors.green : Colors.grey,
+                    color: isPublic ? Color(0xff068288) : Colors.grey,
                     size: 30,
                   ),
                   onPressed: () {
@@ -99,12 +123,58 @@ class Myhome extends ConsumerWidget {
             title: const Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Icon(Icons.arrow_back),
+                SizedBox(width: 8),
+                Text('E展画面移動'),
+              ],
+            ),
+            onTap: () {
+              ref.read(userLocationProvider.notifier).clearUserLocation(user);
+              context.go('/event');
+            },
+          ),
+          // ListTile(
+          //   title: const Row(
+          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          //     children: [
+          //       Icon(Icons.settings),
+          //       SizedBox(width: 8),
+          //       Text('新規E展作成'),
+          //     ],
+          //   ),
+          //   onTap: () {
+          //     context.go('/myhome/home/newEvents');
+          //   },
+          // ),
+          ListTile(
+            title: user == 'admin@gmail.com'
+                ? const Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(Icons.settings),
+                      SizedBox(width: 8),
+                      Text('フロアガイド編集'),
+                    ],
+                  )
+                : null, // Không hiển thị nếu không phải admin
+            onTap: () {
+              if (user == 'admin@gmail.com') {
+                context.go('/myhome/home/floorEdit');
+              }
+            },
+          ),
+
+          ListTile(
+            title: const Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
                 Icon(Icons.logout),
                 SizedBox(width: 8),
                 Text('ログアウト'),
               ],
             ),
             onTap: () {
+              ref.read(userLocationProvider.notifier).clearUserLocation(user);
               ref.read(authProvider.notifier).logout();
               context.go('/');
             },

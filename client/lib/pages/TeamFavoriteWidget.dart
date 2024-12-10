@@ -1,3 +1,4 @@
+import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/favorite_provider.dart';
@@ -5,10 +6,12 @@ import 'package:client/provider/favorite_provider.dart';
 class TeamFavoriteWidget extends ConsumerStatefulWidget {
   final String? userEmail;
   final String? teamNo;
+  final int? eventId;
   const TeamFavoriteWidget({
     Key? key,
     required this.userEmail,
     required this.teamNo,
+    required this.eventId,
   }) : super(key: key);
   @override
   _TeamFavoriteSate createState() => _TeamFavoriteSate();
@@ -18,12 +21,15 @@ class _TeamFavoriteSate extends ConsumerState<TeamFavoriteWidget> {
   @override
   void initState() {
     super.initState();
-    ref.read(favoriteProvider.notifier).fetchFavorite(widget.userEmail);
+    ref
+        .read(favoriteProvider.notifier)
+        .fetchFavorite(widget.userEmail, widget.eventId);
   }
 
   @override
   Widget build(BuildContext context) {
     final favoriteList = ref.watch(favoriteProvider);
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
 
     final isFavorite = favoriteList.any(
       (favorite) =>
@@ -49,7 +55,7 @@ class _TeamFavoriteSate extends ConsumerState<TeamFavoriteWidget> {
           }
           await ref
               .read(favoriteProvider.notifier)
-              .fetchFavorite(widget.userEmail);
+              .fetchFavorite(widget.userEmail, eventId);
         } catch (error) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(

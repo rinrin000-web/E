@@ -157,6 +157,7 @@ class _FloorguideState extends ConsumerState<Floorguide> {
                                       const Color.fromARGB(255, 244, 196, 200),
                                   thumbColor: const Color(0xffFF7A66),
                                   value: userCounts[i].toDouble(),
+                                  // value: 20,
                                   min: 0,
                                   max: 30,
                                   divisions: 100,

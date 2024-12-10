@@ -3,9 +3,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Event;
+use App\Models\Eventsmange;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
-
+use Illuminate\Support\Facades\Storage;
 class TeamController extends Controller
 {
     //
@@ -44,35 +45,126 @@ class TeamController extends Controller
     ]);
 }
 
+public function store(Request $request, $eventId)
+{
+    // Validate the incoming request data
+    $request->validate([
+        'team_no' => 'required|string|unique:teams,team_no', // team_no must be unique
+        'teamfileimages' => 'nullable|file|mimes:jpg,jpeg,png,gif', // Validate image file
+        'floor_no' => 'required|exists:floors,floor_no', // Ensure floor_no exists in floors table
+        // 'rank' => 'nullable|numeric', // Optional rank field
+    ]);
 
+    $imagePath = null;
+    if ($request->hasFile('teamfileimages')) {
+        // If the image file is provided, store it
+        $file = $request->file('teamfileimages');
+        $fileName = 'team_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $imagePath = $file->storeAs('teamfileimages', $fileName, 'public'); // Store in 'teamfileimages' folder
+    }
 
-    public function updateTeamImage(Request $request, $team_no)
+    // Create the team record in the database
+    $team = Team::create([
+        'team_no' => $request->team_no,
+        'teamfileimages' => $imagePath, // Store image path
+        'floor_no' => $request->floor_no,
+        // 'rank' => $request->rank,
+    ]);
+
+    // Create the record in the Eventsmange table to link team with event
+    $eventManage = Eventsmange::create([
+        'event_id' => $eventId, // Use eventId directly
+        'team_no' => $request->team_no,
+    ]);
+
+    return response()->json([
+        'message' => 'Team created successfully',
+        'team' => $team,
+        'event_manage' => $eventManage,
+    ], 201);
+}
+
+public function updateTeamImage(Request $request, $team_no)
+{
+    $request->validate([
+        'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Xác thực file ảnh
+    ]);
+
+    if ($request->hasFile('teamfileimages')) {
+        $file = $request->file('teamfileimages');
+        $fileName = 'team_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+        // Lưu file vào thư mục public storage
+        $filePath = $file->storeAs('teamfileimages', $fileName, 'public');
+
+        // Tìm team theo team_no
+        $team = Team::where('team_no', $team_no)->first();
+
+        if (!$team) {
+            return response()->json(['message' => 'Team not found'], 404);
+        }
+
+        // Xóa ảnh cũ (nếu có)
+        if ($team->teamfileimages) {
+            Storage::disk('public')->delete($team->teamfileimages);
+        }
+
+        // Cập nhật cột teamfileimages
+        $team->update(['teamfileimages' => $filePath]);
+
+        return response()->json([
+            'message' => 'Image updated successfully',
+            'team' => $team,
+        ], 200);
+    } else {
+        return response()->json(['message' => 'No image uploaded'], 400);
+    }
+}
+
+    public function update(Request $request,$team_no)
     {
         $request->validate([
-            'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',  // Xác thực file ảnh
+            'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+            'floor_no' => 'required|exists:floors,floor_no',
         ]);
-
-        // Xử lý upload ảnh (nếu có)
-        if ($request->hasFile('teamfileimages')) {
-            // $imagePath = $request->file('teamfileimages')->store('teams', 'public');
-            $file = $request->file('teamfileimages');
-            $imagePath = $file->store('teamfileimages');
-            $fileName = $file->hashName();
-
-            // Cập nhật cột teamfileimages của bản ghi cụ thể với id = $id
-            $team = Team::find($team_no); // Tìm bản ghi theo id
-            if ($team) {
-                $team->update([
-                    'teamfileimages' => $fileName,
-                ]);
-
-                return response()->json(['message' => 'Image updated successfully', 'team' => $team], 200);
-            } else {
-                return response()->json(['message' => 'Team not found'], 404);
-            }
-        } else {
-            return response()->json(['message' => 'No image uploaded'], 400);
+        $team = Team::where('team_no', $team_no)->first();
+        if (!$team) {
+            return response()->json(['message' => 'Team not found'], 404);
         }
+
+        if ($request->hasFile('teamfileimages')) {
+            // If the image file is provided, store it
+            $file = $request->file('teamfileimages');
+            $fileName = 'team_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $imagePath = $file->storeAs('teamfileimages', $fileName, 'public'); // Store in 'teamfileimages' folder
+        }
+        if ($team->teamfileimages) {
+            Storage::disk('public')->delete($team->teamfileimages);
+        }
+        $team->update([
+            'teamfileimages' => $imagePath,
+            'floor_no' => $request->floor_no,
+        ]);
+        return response()->json($team);
+    }
+
+
+    public function destroy($team_no)
+    {
+        $teams = Team::where('team_no', $team_no)->first();
+
+        if (!$teams) {
+            return response()->json(['message' => 'Event not found'], 404);
+        }
+
+        // Xóa ảnh nếu có
+        if ($teams->images) {
+            Storage::disk('public')->delete($teams->images);
+        }
+
+        $teams->delete();
+
+        return response()->json(['message' => 'Event deleted successfully', 'data' => $teams], 200);
     }
 
     public function index($team_no = null)
@@ -98,34 +190,7 @@ class TeamController extends Controller
             return response()->json(['error' => 'Failed to update team ranks', 'message' => $e->getMessage()]);
         }
     }
-//     public function getRank($team_no)
-// {
-//     try {
-//         // Truy vấn để tính toán rank trung bình từ bảng comment và cập nhật vào bảng teams
-//         DB::update('
-//             UPDATE teams t
-//                 JOIN (
-//                     SELECT team_no, AVG(`rank`) AS avg_rank
-//                     FROM comment
-//                     GROUP BY team_no
-//                 ) AS avg_data ON t.team_no = avg_data.team_no
-//                 SET t.rank = avg_data.avg_rank;
-//             ');
 
-//         $rank = DB::table('teams')
-//         ->where('team_no', $team_no)
-//         ->value('rank');
-
-//         if (is_null($rank)) {
-//             return response()->json(['message' => 'Team not found'], 404);
-//         }
-//         return response()->json(['rank' => $rank]);
-
-//     } catch (\Exception $e) {
-//         // Xử lý lỗi nếu có
-//         return response()->json(['error' => 'Failed to update team ranks', 'message' => $e->getMessage()]);
-//     }
-// }
 public function getRank($team_no, $event_id)
 {
     try {
@@ -170,12 +235,6 @@ public function getRank($team_no, $event_id)
     }
 }
 
-
-
-
-    // function Search($team_no){
-    //     return Team::where("team_no",$team_no)->get();
-    // }
     public function getImage($filename)
 {
     Log::info("Filename requested: $filename");

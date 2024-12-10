@@ -51,16 +51,17 @@ class OverviewNotifier extends StateNotifier<List<Overview>> {
     }
   }
 
-  Future<Overview> createOverview(Overview overview) async {
+  Future<Overview> createOverview(String? team_no, String slogan,
+      String overallplanning, String techused, String tools) async {
     final response = await http.post(
-      Uri.parse(baseUrl),
+      Uri.parse('$baseUrl/$team_no'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'team_no': overview.team_no,
-        'slogan': overview.slogan,
-        'overallplanning': overview.overallplanning,
-        'techused': overview.techused,
-        'tools': overview.tools,
+        // 'team_no': team_no,
+        'slogan': slogan,
+        'overallplanning': overallplanning,
+        'techused': techused,
+        'tools': tools,
       }),
     );
 
@@ -71,15 +72,16 @@ class OverviewNotifier extends StateNotifier<List<Overview>> {
     }
   }
 
-  Future<Overview> updateOverview(String? teamNo, Overview overview) async {
+  Future<Overview> updateOverview(String? teamNo, String slogan,
+      String overallplanning, String techused, String tools) async {
     final response = await http.put(
       Uri.parse('$baseUrl/$teamNo'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({
-        'slogan': overview.slogan,
-        'overallplanning': overview.overallplanning,
-        'techused': overview.techused,
-        'tools': overview.tools,
+        'slogan': slogan,
+        'overallplanning': overallplanning,
+        'techused': techused,
+        'tools': tools,
       }),
     );
 

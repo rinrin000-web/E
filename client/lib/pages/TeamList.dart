@@ -93,7 +93,7 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
   final images = ClipRRect(
       borderRadius: BorderRadius.circular(8.0),
       child: Image.network(
-        '${team.image}',
+        '${team.teamfileimages}',
         fit: BoxFit.contain,
         height: 250,
         width: double.infinity,
@@ -106,7 +106,7 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
   return GestureDetector(
     onTap: () {
       ref.read(selectedTeamProvider.notifier).state = team.team_no;
-      context.push('/myhome/home/myteam');
+      context.push('/myhome/myteam');
 
       print(team.team_no);
     },
@@ -125,7 +125,46 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
                   TeamRankWidget(teamNo: team.team_no, eventId: eventId),
                 ],
               ),
-              TeamFavoriteWidget(userEmail: user, teamNo: team.team_no)
+              Row(
+                children: [
+                  user == 'admin@gmail.com'
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.edit,
+                            size: 30,
+                          ),
+                          onPressed: () {
+                            // ref.read(selectedTeamProvider.notifier).state =
+                            //     team.team_no;
+                            ref
+                                .read(teamListProvider.notifier)
+                                .selectTeam(team.team_no!);
+                            print(
+                                'selectedteam ${ref.read(selectedTeamProvider.notifier).state}');
+                            context.go('/myhome/home/updateTeams');
+                          },
+                        )
+                      : SizedBox.shrink(),
+                  user == 'admin@gmail.com'
+                      ? IconButton(
+                          icon: const Icon(
+                            Icons.delete_outlined,
+                            size: 30,
+                          ),
+                          onPressed: () {
+                            ref
+                                .read(teamListProvider.notifier)
+                                .deleteTeams(team.team_no);
+                          },
+                        )
+                      : SizedBox.shrink(),
+                  TeamFavoriteWidget(
+                    userEmail: user,
+                    teamNo: team.team_no,
+                    eventId: eventId,
+                  ),
+                ],
+              ) // Return an empty widget if the user is not admin
             ],
           ),
           const SizedBox(

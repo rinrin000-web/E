@@ -24,10 +24,10 @@ class Team extends Model
 {
     return $this->belongsTo(Comment::class, 'team_no', 'team_no');
 }
-public function event()
-{
-    return $this->belongsTo(Event::class, 'team_no', 'team_no');
-}
+// public function event()
+// {
+//     return $this->belongsTo(Event::class, 'team_no', 'team_no');
+// }
 public function eventsManage()
 {
     return $this->hasMany(Eventsmange::class, 'team_no', 'team_no');

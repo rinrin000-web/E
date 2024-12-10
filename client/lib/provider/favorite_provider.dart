@@ -31,9 +31,10 @@ class FavoriteNotifier extends StateNotifier<List<Favorite>> {
   FavoriteNotifier() : super([]);
   final String baseUrl = 'http://127.0.0.1:8000/api/favorite';
   // Fetch and toggle the favorite status
-  Future<void> fetchFavorite(String? user_email) async {
+  Future<void> fetchFavorite(String? user_email, int? event_id) async {
     try {
-      final response = await http.get(Uri.parse('$baseUrl/$user_email'));
+      final response =
+          await http.get(Uri.parse('$baseUrl/$user_email/$event_id'));
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body)['data'] as List;

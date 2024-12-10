@@ -62,8 +62,8 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
                 height: 40,
                 decoration: BoxDecoration(
                   color: selectedFloor == floor[i].floor_no
-                      ? Colors.orange
-                      : Colors.blue,
+                      ? Color(0xffFD8B51)
+                      : Color(0xff068288),
                   borderRadius: BorderRadius.circular(8.0),
                 ),
                 alignment: Alignment.center,
@@ -71,7 +71,9 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
                   '${floor[i].floor_no}',
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 15),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: Colors.white),
                 ),
               ),
             ),

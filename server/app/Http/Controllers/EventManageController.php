@@ -10,7 +10,7 @@ class EventManageController extends Controller
     //
     public function index()
     {
-        return response()->json(Eventsmange::all());
+        return response()->json(Eventsmange::all(),200,[], JSON_PRETTY_PRINT);
     }
 
     // Thêm đội vào sự kiện

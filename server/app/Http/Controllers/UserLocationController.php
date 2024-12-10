@@ -46,7 +46,7 @@ class UserLocationController extends Controller
     {
         // Validate thông tin từ request
         $request->validate([
-            'floor_no' => 'required|exists:floors,floor_no',  // Kiểm tra nếu tầng tồn tại
+            'floor_no' => 'nullable|exists:floors,floor_no',  // Kiểm tra nếu tầng tồn tại
         ]);
 
         // Tìm người dùng dựa trên email

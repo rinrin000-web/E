@@ -13,8 +13,9 @@ return new class extends Migration
     {
         //
         Schema::create('floors', function (Blueprint $table) {
-            $table->bigIncrements('floor_no'); // Tạo team_id là khóa chính tự động tăng
-            $table->string('contents')->nullable(); // team_no là duy nhất
+            $table->bigIncrements('id'); // Tạo cột id làm khóa chính tự động tăng
+            $table->bigInteger('floor_no')->unsigned()->unique(); // floor_no được đảm bảo là duy nhất nhưng không làm khóa chính
+            $table->string('contents')->nullable(); // contents có thể NULL
             $table->timestamps(0); // created_at và updated_at
         });
 

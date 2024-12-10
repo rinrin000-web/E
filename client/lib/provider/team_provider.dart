@@ -1,24 +1,27 @@
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TeamList {
   final String? team_no;
   final String floor;
   final double rank;
-  String image;
+  final String teamfileimages;
   TeamList(
       {this.team_no,
       required this.floor,
       required this.rank,
-      required this.image});
+      required this.teamfileimages});
 
   factory TeamList.fromJson(Map<String, dynamic> json) {
     return TeamList(
       team_no: json['team_no'],
       floor: json['floor_no'].toString() + 'F', // Chuyển đổi thành floor string
       rank: json['rank'] ?? 0.0,
-      image: 'http://127.0.0.1:8000/api/teams/image/${json['teamfileimages']}',
+      teamfileimages:
+          'http://127.0.0.1:8000/api/teams/${json['teamfileimages']}',
     );
   }
 
@@ -28,30 +31,45 @@ class TeamList {
   }
 }
 
-// Provider lưu trữ team_no của đội được chọn
 final selectedTeamProvider = StateProvider<String?>((ref) => null);
 
 class TeamNotifier extends StateNotifier<List<TeamList>> {
-  TeamNotifier() : super([]);
+  TeamNotifier(this.ref) : super([]) {
+    _initializeState();
+  }
 
-  // Future<void> fetchTeams() async {
-  //   try {
-  //     final response =
-  //         await http.get(Uri.parse('http://127.0.0.1:8000/api/teams'));
+  final Ref ref;
 
-  //     if (response.statusCode == 200) {
-  //       final List<dynamic> data = json.decode(response.body);
-  //       state = data.map((json) => TeamList.fromJson(json)).toList();
-  //       print(state);
-  //     } else {
-  //       print('Error: ${response.statusCode}, ${response.body}');
-  //       throw Exception('Failed to load teams');
-  //     }
-  //   } catch (e) {
-  //     print('Error occurred: $e');
-  //     throw Exception('Failed to load teams');
-  //   }
-  // }
+  /// Initialize state from SharedPreferences
+  Future<void> _initializeState() async {
+    await _loadSelectedTeam(); // Load selected team from SharedPreferences
+  }
+
+  // Load selected team from SharedPreferences
+  Future<void> _loadSelectedTeam() async {
+    final prefs = await SharedPreferences.getInstance();
+    final selectedTeamNo = prefs.getString('selectedTeamNo');
+    if (selectedTeamNo != null) {
+      ref.read(selectedTeamProvider.notifier).state =
+          selectedTeamNo; // Đồng bộ giá trị
+    }
+  }
+
+  // Cập nhật selected team khi giá trị thay đổi
+  Future<void> _updateSelectedTeam(String teamNo) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('selectedTeamNo', teamNo);
+  }
+
+  void selectTeam(String teamNo) async {
+    await _updateSelectedTeam(teamNo);
+    ref.read(selectedTeamProvider.notifier).state =
+        teamNo; // Đồng bộ selectedTeamProvider
+    state = state.map((team) {
+      return team;
+    }).toList(); // Rebuild the state
+  }
+
   Future<void> fetchTeamsbyId(int? id) async {
     try {
       final response = await http
@@ -76,6 +94,71 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     } catch (e) {
       print('Error occurred: $e');
       throw Exception('Failed to load teams');
+    }
+  }
+
+  Future<void> createTeams(
+      int? eventId, String teamNo, String floorNo, Uint8List imageBytes) async {
+    try {
+      var request = http.MultipartRequest(
+          'POST', Uri.parse('http://127.0.0.1:8000/api/teams/$eventId'))
+        ..fields['team_no'] = teamNo
+        ..fields['floor_no'] = floorNo
+        ..files.add(http.MultipartFile.fromBytes('teamfileimages', imageBytes,
+            filename: 'team_image.jpg'));
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var data = json.decode(responseData);
+        print(data);
+      } else {
+        print('Failed to post data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error posting data: $e');
+    }
+  }
+
+  Future<void> updateTeams(
+      String? teamNo, String floorNo, Uint8List imageBytes) async {
+    try {
+      var request = http.MultipartRequest('POST',
+          Uri.parse('http://127.0.0.1:8000/api/teams/update-image/$teamNo'))
+        // ..fields['team_no'] = teamNo
+        ..fields['floor_no'] = floorNo
+        ..files.add(http.MultipartFile.fromBytes('teamfileimages', imageBytes,
+            filename: 'team_image.jpg'));
+
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var data = json.decode(responseData);
+        print(data);
+      } else {
+        print('Failed to post data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error posting data: $e');
+    }
+  }
+
+  Future<void> deleteTeams(String? team_no) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('http://127.0.0.1:8000/api/teams/$team_no'));
+      if (response.statusCode == 200) {
+        // Remove the deleted event from the state
+        state = state.where((teams) => teams.team_no != team_no).toList();
+        print("teams deleted successfully");
+      } else {
+        throw Exception('Failed to delete event');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      throw Exception('Failed to delete event');
     }
   }
 
@@ -114,7 +197,7 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
               team_no: state[teamIndex].team_no,
               floor: state[teamIndex].floor,
               rank: newRank, // Cập nhật rank
-              image: state[teamIndex].image,
+              teamfileimages: state[teamIndex].teamfileimages,
             );
 
             // Đặt lại state để cập nhật UI
@@ -137,7 +220,7 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
 // Đăng ký provider với Riverpod
 final teamListProvider =
     StateNotifierProvider<TeamNotifier, List<TeamList>>((ref) {
-  return TeamNotifier();
+  return TeamNotifier(ref);
 });
 
 // final rankStreamProvider =

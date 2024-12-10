@@ -1,13 +1,19 @@
 import 'package:client/pages/EventScreen.dart';
 import 'package:client/pages/FloorGuide.dart';
+import 'package:client/pages/FloorGuideEdit.dart';
 import 'package:client/pages/HistoryScreen.dart';
 import 'package:client/pages/HomeScreen.dart';
 import 'package:client/pages/ItScreen.dart';
 import 'package:client/pages/LoginScreen.dart';
 import 'package:client/pages/MyHome.dart';
 import 'package:client/pages/MyTeamScreen.dart';
+import 'package:client/pages/NewEventSetting.dart';
+import 'package:client/pages/PRIUpdate.dart';
 import 'package:client/pages/RegisterScreen.dart';
+import 'package:client/pages/T_overviewEdit.dart';
+import 'package:client/pages/UpdateTeams.dart';
 import 'package:client/pages/WebScreen.dart';
+import 'package:client/pages/createTeams.dart';
 import 'package:client/pages/main_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -51,6 +57,10 @@ class MyApp extends ConsumerWidget {
           path: '/event',
           builder: (context, state) => EventScreen(),
         ),
+        GoRoute(
+          path: '/newEvents',
+          builder: (context, state) => NewEventSetting(),
+        ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>
               Myhome(navigationShell: navigationShell),
@@ -61,14 +71,47 @@ class MyApp extends ConsumerWidget {
                   path: '/myhome/home',
                   builder: (context, state) => Homescreen(),
                   routes: [
+                    // GoRoute(
+                    //   path: 'myteam',
+                    //   builder: (context, state) => MyTeamScreen(),
+                    // ),
+                    // GoRoute(
+                    //   path: 'newEvents',
+                    //   builder: (context, state) => NewEventSetting(),
+                    // ),
                     GoRoute(
-                      path: 'myteam',
-                      builder: (context, state) => MyTeamScreen(),
+                      name: 'newTeams',
+                      path: 'newTeams',
+                      builder: (BuildContext context, GoRouterState state) =>
+                          CreateTeams(),
+                    ),
+                    GoRoute(
+                      name: 'updateTeams',
+                      path: 'updateTeams',
+                      builder: (context, state) => UpdateTeams(),
+                    ),
+                    GoRoute(
+                      path: 'profifeIma',
+                      builder: (context, state) => PRIUpdate(),
+                    ),
+                    GoRoute(
+                      path: 'overViewEdit',
+                      builder: (context, state) => TOverviewEdit(),
+                    ),
+                    GoRoute(
+                      path: 'floorEdit',
+                      builder: (context, state) => FloorGuideEdit(),
                     ),
                   ],
                 ),
               ],
             ),
+            StatefulShellBranch(routes: [
+              GoRoute(
+                path: '/myhome/myteam',
+                builder: (context, state) => MyTeamScreen(),
+              ),
+            ]),
             StatefulShellBranch(
               routes: [
                 GoRoute(

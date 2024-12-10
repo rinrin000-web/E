@@ -2,6 +2,7 @@ import 'package:client/pages/CommentScreen.dart';
 import 'package:client/pages/FullScreenImage.dart';
 import 'package:client/pages/MemberScreen.dart';
 import 'package:client/pages/OverviewScreen.dart';
+import 'package:client/pages/TeamFavoriteWidget.dart';
 import 'package:client/pages/TeamList.dart';
 import 'package:client/pages/UserReview.dart';
 import 'package:client/provider/auth_provider.dart';
@@ -39,7 +40,7 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
     final teamfileimages = ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: Image.network(
-          selectedTeam.image,
+          selectedTeam.teamfileimages,
           fit: BoxFit.fill,
           height: 300,
           width: double.infinity,
@@ -164,6 +165,14 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
               ),
             ],
           ),
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: TeamFavoriteWidget(
+          userEmail: user,
+          teamNo: selectedTeamNo,
+          eventId: eventId,
         ),
       ),
     );

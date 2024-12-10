@@ -1,5 +1,8 @@
+import 'dart:math';
+
 import 'package:client/provider/auth_provider.dart';
 import 'package:client/provider/comment_provider.dart';
+import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/favorite_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -15,9 +18,10 @@ class HistoryScreen extends ConsumerStatefulWidget {
 
 class _HistoryScreenState extends ConsumerState<HistoryScreen> {
   @override
-  void initState() {
-    super.initState();
-    ref.read(favoriteProvider.notifier).fetchFavorite(widget.user);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+    ref.read(favoriteProvider.notifier).fetchFavorite(widget.user, eventId);
   }
 
   @override

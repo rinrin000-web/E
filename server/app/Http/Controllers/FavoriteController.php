@@ -8,15 +8,43 @@ use App\Models\Favorite;
 class FavoriteController extends Controller
 {
     // Lấy danh sách các yêu thích của người dùng (theo email)
-    public function index($user_email = null)
+    // public function index($user_email = null)
+    // {
+    //     $favorites = $user_email ? Favorite::where('user_email', $user_email)->get() : Favorite::all();
+
+    //     return response()->json([
+    //         'status' => true,
+    //         'data' => $favorites
+    //     ], 200);
+    // }
+    public function index($user_email, $event_id)
     {
-        $favorites = $user_email ? Favorite::where('user_email', $user_email)->get() : Favorite::all();
+        $favorites = Favorite::query();
+
+        // Nếu có `user_email`, lọc theo email người dùng
+        if ($user_email) {
+            $favorites->where('user_email', $user_email);
+        }
+
+        // Nếu có `event_id`, lọc theo sự kiện thông qua mối quan hệ với `Team` và `Eventsmange`
+        if ($event_id) {
+            $favorites->whereHas('team.eventsManage.events', function ($query) use ($event_id) {
+                // Thay 'events.event_id' bằng 'events.id' vì 'id' là khóa chính của bảng events
+                $query->where('events.id', $event_id);
+            });
+        }
+
+        // Lấy kết quả
+        $favorites = $favorites->get();
 
         return response()->json([
             'status' => true,
-            'data' => $favorites
+            'data' => $favorites,
         ], 200);
     }
+
+
+
 
     // Lưu hoặc cập nhật trạng thái yêu thích
     public function store(Request $request)

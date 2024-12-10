@@ -89,6 +89,25 @@ class EventsNotifier extends StateNotifier<List<Event>> {
       throw Exception('Failed to load events');
     }
   }
+
+  Future<void> deleteEvent(int? eventId) async {
+    final url = Uri.parse('$baseUrl/$eventId');
+
+    try {
+      final response = await http.delete(url);
+
+      if (response.statusCode == 200) {
+        // Remove the deleted event from the state
+        state = state.where((event) => event.id != eventId).toList();
+        print("Event deleted successfully");
+      } else {
+        throw Exception('Failed to delete event');
+      }
+    } catch (e) {
+      print('Error occurred: $e');
+      throw Exception('Failed to delete event');
+    }
+  }
 }
 
 // Define the event provider

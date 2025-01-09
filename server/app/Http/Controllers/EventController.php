@@ -53,48 +53,91 @@ class EventController extends Controller
         ], 201);
     }
 
+    public function update(Request $request, $eventId)
+{
+    $request->validate([
+        'event_name' => 'nullable|string|max:255',
+        'event_date' => 'nullable|date',
+        'images' => 'nullable|file|mimes:jpeg,png,jpg,gif|max:2048',
+    ]);
 
-    public function update(Request $request,$id)
-    {
-        $events = Event::find($id);
-        $events->update($request->all());
-        return response()->json($events);
+    $event = Event::where('id', $eventId)->first();
+
+    if (!$event) {
+        return response()->json(['message' => 'Event not found'], 404);
     }
+
+    // Khởi tạo mảng chứa dữ liệu cần cập nhật
+    $dataToUpdate = [];
+
+    // Kiểm tra và thêm các trường cần cập nhật
+    if ($request->has('event_name')) {
+        $dataToUpdate['event_name'] = $request->event_name;
+    }
+
+    if ($request->has('event_date')) {
+        $dataToUpdate['event_date'] = $request->event_date;
+    }
+
+    if ($request->hasFile('images')) {
+        // Xóa ảnh cũ nếu có
+        if ($event->images) {
+            Storage::disk('public')->delete($event->images);
+        }
+
+        // Lưu ảnh mới
+        $file = $request->file('images');
+        $imagePath = $file->store('eventimages', 'public');
+        $dataToUpdate['images'] = $imagePath;
+    }
+
+    // Cập nhật bản ghi
+    $event->update($dataToUpdate);
+
+    return response()->json($event);
+}
+
+    // public function update(Request $request,$id)
+    // {
+    //     $events = Event::find($id);
+    //     $events->update($request->all());
+    //     return response()->json($events);
+    // }
 
 
     // Cập nhật ảnh theo event_name
-    public function updateTeamImage(Request $request, $id)
-    {
-        $request->validate([
-            'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',  // Xác thực file ảnh
-        ]);
+    // public function updateTeamImage(Request $request, $id)
+    // {
+    //     $request->validate([
+    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',  // Xác thực file ảnh
+    //     ]);
 
-        // Tìm sự kiện theo event_name
-        $event = Event::where('id', $id)->first();
+    //     // Tìm sự kiện theo event_name
+    //     $event = Event::where('id', $id)->first();
 
-        if (!$event) {
-            return response()->json(['message' => 'Event not found'], 404);
-        }
+    //     if (!$event) {
+    //         return response()->json(['message' => 'Event not found'], 404);
+    //     }
 
-        // Xử lý upload ảnh (nếu có)
-        if ($request->hasFile('images')) {
-            $file = $request->file('images');
-            // $fileName = $eventName . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $imagePath = $file->store('eventimages');
+    //     // Xử lý upload ảnh (nếu có)
+    //     if ($request->hasFile('images')) {
+    //         $file = $request->file('images');
+    //         // $fileName = $eventName . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+    //         $imagePath = $file->store('eventimages');
 
-            // Xóa ảnh cũ nếu có
-            if ($event->images) {
-                Storage::disk('public')->delete($event->images);
-            }
+    //         // Xóa ảnh cũ nếu có
+    //         if ($event->images) {
+    //             Storage::disk('public')->delete($event->images);
+    //         }
 
-            $event->images = $imagePath;
-            $event->save();
+    //         $event->images = $imagePath;
+    //         $event->save();
 
-            return response()->json(['message' => 'Image updated successfully', 'event' => $event], 200);
-        } else {
-            return response()->json(['message' => 'No image uploaded'], 400);
-        }
-    }
+    //         return response()->json(['message' => 'Image updated successfully', 'event' => $event], 200);
+    //     } else {
+    //         return response()->json(['message' => 'No image uploaded'], 400);
+    //     }
+    // }
 
     // Lấy ảnh theo tên file
     public function getImage($filename)

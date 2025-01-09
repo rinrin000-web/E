@@ -84,69 +84,84 @@ public function store(Request $request, $eventId)
     ], 201);
 }
 
-public function updateTeamImage(Request $request, $team_no)
+// public function updateTeamImage(Request $request, $team_no)
+// {
+//     $request->validate([
+//         'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Xác thực file ảnh
+//     ]);
+
+//     if ($request->hasFile('teamfileimages')) {
+//         $file = $request->file('teamfileimages');
+//         $fileName = 'team_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+
+//         // Lưu file vào thư mục public storage
+//         $filePath = $file->storeAs('teamfileimages', $fileName, 'public');
+
+//         // Tìm team theo team_no
+//         $team = Team::where('team_no', $team_no)->first();
+
+//         if (!$team) {
+//             return response()->json(['message' => 'Team not found'], 404);
+//         }
+
+//         // Xóa ảnh cũ (nếu có)
+//         if ($team->teamfileimages) {
+//             Storage::disk('public')->delete($team->teamfileimages);
+//         }
+
+//         // Cập nhật cột teamfileimages
+//         $team->update(['teamfileimages' => $filePath]);
+
+//         return response()->json([
+//             'message' => 'Image updated successfully',
+//             'team' => $team,
+//         ], 200);
+//     } else {
+//         return response()->json(['message' => 'No image uploaded'], 400);
+//     }
+// }
+
+public function update(Request $request, $team_no)
 {
     $request->validate([
-        'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Xác thực file ảnh
+        'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
+        'floor_no' => 'nullable|exists:floors,floor_no',
     ]);
 
+    $team = Team::where('team_no', $team_no)->first();
+
+    if (!$team) {
+        return response()->json(['message' => 'Team not found'], 404);
+    }
+
+    // Khởi tạo mảng chứa dữ liệu cần cập nhật
+    $dataToUpdate = [];
+
+    // Kiểm tra nếu có tệp hình ảnh mới
     if ($request->hasFile('teamfileimages')) {
+        // Xóa ảnh cũ nếu có
+        if ($team->teamfileimages) {
+            Storage::disk('public')->delete($team->teamfileimages);
+        }
+
+        // Lưu ảnh mới
         $file = $request->file('teamfileimages');
         $fileName = 'team_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-        // Lưu file vào thư mục public storage
-        $filePath = $file->storeAs('teamfileimages', $fileName, 'public');
-
-        // Tìm team theo team_no
-        $team = Team::where('team_no', $team_no)->first();
-
-        if (!$team) {
-            return response()->json(['message' => 'Team not found'], 404);
-        }
-
-        // Xóa ảnh cũ (nếu có)
-        if ($team->teamfileimages) {
-            Storage::disk('public')->delete($team->teamfileimages);
-        }
-
-        // Cập nhật cột teamfileimages
-        $team->update(['teamfileimages' => $filePath]);
-
-        return response()->json([
-            'message' => 'Image updated successfully',
-            'team' => $team,
-        ], 200);
-    } else {
-        return response()->json(['message' => 'No image uploaded'], 400);
+        $imagePath = $file->storeAs('teamfileimages', $fileName, 'public');
+        $dataToUpdate['teamfileimages'] = $imagePath;
     }
+
+    // Cập nhật floor_no nếu có
+    if ($request->has('floor_no')) {
+        $dataToUpdate['floor_no'] = $request->floor_no;
+    }
+
+    // Cập nhật bản ghi
+    $team->update($dataToUpdate);
+
+    return response()->json($team);
 }
 
-    public function update(Request $request,$team_no)
-    {
-        $request->validate([
-            'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
-            'floor_no' => 'required|exists:floors,floor_no',
-        ]);
-        $team = Team::where('team_no', $team_no)->first();
-        if (!$team) {
-            return response()->json(['message' => 'Team not found'], 404);
-        }
-
-        if ($request->hasFile('teamfileimages')) {
-            // If the image file is provided, store it
-            $file = $request->file('teamfileimages');
-            $fileName = 'team_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-            $imagePath = $file->storeAs('teamfileimages', $fileName, 'public'); // Store in 'teamfileimages' folder
-        }
-        if ($team->teamfileimages) {
-            Storage::disk('public')->delete($team->teamfileimages);
-        }
-        $team->update([
-            'teamfileimages' => $imagePath,
-            'floor_no' => $request->floor_no,
-        ]);
-        return response()->json($team);
-    }
 
 
     public function destroy($team_no)
@@ -248,6 +263,5 @@ public function getRank($team_no, $event_id)
 
     return response()->file($path); // Trả về tệp hình ảnh
 }
-
 
 }

@@ -50,13 +50,14 @@ class _HomescreenState extends ConsumerState<Homescreen> {
       fit: BoxFit.contain,
     );
     return Scaffold(
-        backgroundColor: Colors.transparent,
-        body: Container(
-          padding: const EdgeInsets.all(10.0),
-          height: MediaQuery.of(context).size.height,
-          child: Stack(
-            children: [
-              list,
+      backgroundColor: Colors.transparent,
+      body: Container(
+        padding: const EdgeInsets.all(10.0),
+        height: MediaQuery.of(context).size.height,
+        child: Stack(
+          children: [
+            list,
+            if (user != 'admin@gmail.com')
               Positioned(
                   bottom: 10,
                   // right: 10,
@@ -72,21 +73,21 @@ class _HomescreenState extends ConsumerState<Homescreen> {
                       )
                     ],
                   ))
-            ],
-          ),
+          ],
         ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {},
-          child: user == 'admin@gmail.com'
-              ? IconButton(
+      ),
+      floatingActionButton: user == 'admin@gmail.com'
+          ? FloatingActionButton(
+              onPressed: () {},
+              child: IconButton(
                   onPressed: () {
                     context.go('/myhome/home/newTeams');
                   },
                   icon: const Icon(
                     Icons.add,
                     size: 30,
-                  ))
-              : null,
-        ));
+                  )))
+          : null,
+    );
   }
 }

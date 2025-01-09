@@ -1,15 +1,17 @@
+import 'package:client/ForgotPassword.dart';
+import 'package:client/LoginScreen.dart';
+import 'package:client/pages/EditEvents.dart';
 import 'package:client/pages/EventScreen.dart';
 import 'package:client/pages/FloorGuide.dart';
 import 'package:client/pages/FloorGuideEdit.dart';
 import 'package:client/pages/HistoryScreen.dart';
 import 'package:client/pages/HomeScreen.dart';
 import 'package:client/pages/ItScreen.dart';
-import 'package:client/pages/LoginScreen.dart';
 import 'package:client/pages/MyHome.dart';
 import 'package:client/pages/MyTeamScreen.dart';
 import 'package:client/pages/NewEventSetting.dart';
 import 'package:client/pages/PRIUpdate.dart';
-import 'package:client/pages/RegisterScreen.dart';
+import 'package:client/RegisterScreen.dart';
 import 'package:client/pages/T_overviewEdit.dart';
 import 'package:client/pages/UpdateTeams.dart';
 import 'package:client/pages/WebScreen.dart';
@@ -35,9 +37,20 @@ class MyApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final user = ref.watch(authProvider).commentUser;
-    final initialLocation =
-        ref.watch(authProvider).isAuthenticated ? '/event' : '/';
-
+    // final initialLocation;
+    final islogin = ref.watch(authProvider.select((state) => state.isLogin));
+    final isSignup = ref.watch(authProvider.select((state) => state.isSignup));
+    String initialLocation;
+    if (islogin == true && isSignup == false) {
+      initialLocation =
+          (ref.watch(authProvider).isAuthenticated ? '/event' : '/login');
+    } else if (isSignup == true && islogin == false) {
+      initialLocation =
+          (ref.watch(authProvider).isAuthenticated ? '/event' : '/signup');
+    } else {
+      initialLocation =
+          (ref.watch(authProvider).isAuthenticated ? '/event' : '/');
+    }
     final GoRouter _router = GoRouter(
       initialLocation: initialLocation,
       routes: [
@@ -49,6 +62,10 @@ class MyApp extends ConsumerWidget {
           path: '/login',
           builder: (context, state) => LoginScreen(),
         ),
+        // GoRoute(
+        //   path: '/forgotPassword',
+        //   builder: (context, state) => ForgotPassword(),
+        // ),
         GoRoute(
           path: '/signup',
           builder: (context, state) => RegisterScreen(),
@@ -61,6 +78,10 @@ class MyApp extends ConsumerWidget {
           path: '/newEvents',
           builder: (context, state) => NewEventSetting(),
         ),
+        GoRoute(
+          path: '/editEvents',
+          builder: (context, state) => EditEvents(),
+        ),
         StatefulShellRoute.indexedStack(
           builder: (context, state, navigationShell) =>
               Myhome(navigationShell: navigationShell),
@@ -69,6 +90,7 @@ class MyApp extends ConsumerWidget {
               routes: [
                 GoRoute(
                   path: '/myhome/home',
+                  name: 'home',
                   builder: (context, state) => Homescreen(),
                   routes: [
                     // GoRoute(
@@ -116,6 +138,7 @@ class MyApp extends ConsumerWidget {
               routes: [
                 GoRoute(
                   path: '/myhome/it',
+                  name: 'it',
                   builder: (context, state) => Itscreen(),
                 ),
               ],
@@ -124,6 +147,7 @@ class MyApp extends ConsumerWidget {
               routes: [
                 GoRoute(
                   path: '/myhome/web',
+                  name: 'web',
                   builder: (context, state) => WebScreen(),
                 ),
               ],
@@ -235,12 +259,12 @@ class WellcomeScreen extends ConsumerWidget {
                         height: 43,
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => LoginScreen()),
-                            );
-                            // context.push('/login');
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //       builder: (context) => LoginScreen()),
+                            // );
+                            context.push('/login');
                           },
                           style: ElevatedButton.styleFrom(
                             padding: EdgeInsets.zero, // Xóa padding mặc định

@@ -12,7 +12,8 @@ use App\Http\Controllers\UserLocationController;
 use App\Http\Controllers\FavoriteController;
 use App\Http\Controllers\EventController;
 use App\Http\Controllers\EventManageController;
-
+use App\Http\Controllers\ResetPasswordController;
+use Illuminate\Support\Facades\Mail;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -32,7 +33,25 @@ Route::get('login', [UserController::class, 'login'])->name('login');
 Route::post('signup', [UserController::class, 'signup']);
 Route::get('signup', [UserController::class, 'signup']);
 Route::get('logout', [UserController::class, 'logout']);
+// routes/api.php
+// Route::post('/password/reset', 'Auth\ResetPasswordController@resetApp');
+Route::post('/password/reset', [ResetPasswordController::class, 'resetApp'])->name('password.reset');
+Route::put('/password/update', [ResetPasswordController::class, 'resetPassword']);
+Route::post('/send-email', function (Request $request) {
+    $details = [
+        'title' => $request->input('title'),
+        'body' => $request->input('body'),
+    ];
 
+    $recipient = $request->input('email');
+
+    try {
+        Mail::to($recipient)->send(new \App\Mail\TestMail($details));
+        return response()->json(['message' => 'Email sent successfully!'], 200);
+    } catch (\Exception $e) {
+        return response()->json(['message' => 'Failed to send email', 'error' => $e->getMessage()], 500);
+    }
+});
 // admin権限のあるユーザの操作
 Route::middleware('auth:api', 'admin_auth')->group(function(){
     Route::get('/admin', function(){
@@ -69,9 +88,13 @@ Route::prefix('floors')->group(function () {
 Route::get('/user/location/{email?}', [UserLocationController::class, 'show']);
 Route::put('/user/location/{email}', [UserLocationController::class, 'update']);
 
-Route::get('/memberfileimages/{team_no?}', [MemberimagesController::class, 'index']);
-Route::post('/memberfileimages/update-image/{team_no}', [MemberimagesController::class, 'updateTeamImage']);
-Route::get('/memberfileimages/memberfileimages/{filename}', [MemberimagesController::class, 'getImage']);
+Route::prefix('memberfileimages')->group(function () {
+    Route::get('{team_no?}', [MemberimagesController::class, 'index']);
+    Route::delete('/{id}', [MemberimagesController::class, 'destroy']);
+    Route::post('/update-image/{team_no}', [MemberimagesController::class, 'updateTeamImage']);
+    Route::post('{id}', [MemberimagesController::class, 'update']);
+    Route::get('/memberfileimages/{filename}', [MemberimagesController::class, 'getImage']);
+});
 
 // Route::get('/comment/{team_no?}', [CommentController::class, 'index']);
 // Route::post('/comment/addComment/{team_no}', [CommentController::class, 'addComment']);
@@ -122,8 +145,8 @@ Route::prefix('events')->group(function () {
     // Tạo mới comment
     Route::post('/', [EventController::class, 'store']);
 
-    Route::put('/{id}', [EventController::class, 'update']);
-    Route::post('/updateTeamImage/{id}', [EventController::class, 'updateTeamImage']);
+    Route::post('/{eventId}', [EventController::class, 'update']);
+    // Route::post('/updateTeamImage/{id}', [EventController::class, 'updateTeamImage']);
     Route::get('/eventimages/{filename}', [EventController::class, 'getImage']);
     // Route::get('/{eventName}', [EventController::class, 'getFirstImageByEventName']);
 

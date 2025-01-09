@@ -106,34 +106,43 @@ class _EventScreenState extends ConsumerState<EventScreen> {
             const SizedBox(height: 20),
             circle_list,
             const SizedBox(height: 20),
-            IconButton(
-                icon: const Icon(
-                  Icons.delete,
-                  size: 30,
-                  color: Colors.red,
-                ),
-                onPressed: () {
-                  ref
-                      .read(eventProvider.notifier)
-                      .deleteEvent(event_images[selectedIndex].id);
-                }),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                if (user == 'admin@gmail.com')
+                  IconButton(
+                      icon: const Icon(
+                        Icons.edit,
+                        size: 30,
+                        // color: Colors.red,
+                      ),
+                      onPressed: () {
+                        context.go('/editEvents');
+                      }),
+                IconButton(
+                    icon: const Icon(
+                      Icons.delete,
+                      size: 30,
+                      color: Colors.red,
+                    ),
+                    onPressed: () {
+                      ref
+                          .read(eventProvider.notifier)
+                          .deleteEvent(event_images[selectedIndex].id);
+                    }),
+              ],
+            )
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // context.go('/myhome/home/newEvents');
-        },
-        child: user == "admin@gmail.com"
-            ? IconButton(
-                onPressed: () {
-                  context.go('/newEvents');
-                },
-                icon: const Icon(
-                  Icons.add,
-                ))
-            : null,
-      ),
+      floatingActionButton: user == 'admin@gmail.com'
+          ? FloatingActionButton(
+              onPressed: () {
+                context.go('/newEvents');
+              },
+              child: const Icon(Icons.add),
+            )
+          : null,
 
       // Container(
       //   padding: EdgeInsets.all(15),

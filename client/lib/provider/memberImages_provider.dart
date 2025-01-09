@@ -75,6 +75,46 @@ class MemberImagesNotifier extends StateNotifier<List<MemberImages>> {
       }
     }
   }
+
+  Future<void> update(int id, List<Uint8List> imageBytesList) async {
+    for (var imageBytes in imageBytesList) {
+      try {
+        var request = http.MultipartRequest('POST',
+            Uri.parse('http://127.0.0.1:8000/api/memberfileimages/$id'));
+
+        request.files.add(http.MultipartFile.fromBytes(
+            'memberfileimages', imageBytes,
+            filename: 'member_image.jpg'));
+
+        var response = await request.send();
+
+        if (response.statusCode == 201) {
+          var responseData = await response.stream.bytesToString();
+          var data = json.decode(responseData);
+          print(data);
+        } else {
+          print('Failed to post data: ${response.statusCode}');
+        }
+      } catch (e) {
+        print('Error posting data: $e');
+      }
+    }
+  }
+
+  Future<void> deleteImages(int id) async {
+    try {
+      final response = await http
+          .delete(Uri.parse('http://127.0.0.1:8000/api/memberfileimages/$id'));
+      if (response.statusCode == 200) {
+        state = state.where((memberImages) => memberImages.id != id).toList();
+        print("images deleted successfully");
+      } else {
+        throw Exception('Failed to delete images');
+      }
+    } catch (e) {
+      throw Exception('Failed to delete images');
+    }
+  }
 }
 
 final memberImagesProvider =

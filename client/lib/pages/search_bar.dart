@@ -38,26 +38,34 @@ class _SearchbarState extends ConsumerState<Searchbar> {
         height: 46,
         width: MediaQuery.of(context).size.width * 0.8,
         alignment: Alignment.center,
-        padding: EdgeInsets.symmetric(horizontal: 8.0),
+        padding: const EdgeInsets.symmetric(horizontal: 8.0),
         decoration: BoxDecoration(
-          color: Color(0xff068288),
+          color: const Color(0xff068288),
           borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(color: Color(0xff068288)),
+          border: Border.all(color: const Color(0xff068288)),
         ),
         child: TextField(
           controller: _controller,
           style: const TextStyle(
             fontSize: 18.0,
             fontWeight: FontWeight.bold,
-            color: Colors.black, // Màu chữ nếu cần
+            color: Colors.black,
           ),
-          // textAlignVertical: TextAlignVertical.center,
           decoration: InputDecoration(
             hintText: '作品番号検索',
             hintStyle: const TextStyle(color: Color(0xff62B9BE)),
-            prefixIcon: Icon(Icons.search, color: Colors.black),
+            prefixIcon: GestureDetector(
+              onTap: () {
+                final query = _controller.text;
+                ref.read(searchProvider.notifier).updateQuery(query);
+                ref
+                    .read(teamListProvider.notifier)
+                    .searchByTeamNo(query, widget.eventId);
+              },
+              child: const Icon(Icons.search, color: Colors.black),
+            ),
             suffixIcon: IconButton(
-              icon: Icon(Icons.clear, color: Colors.black26),
+              icon: const Icon(Icons.clear, color: Colors.black26),
               onPressed: () {
                 _controller.clear();
                 ref.read(searchProvider.notifier).updateQuery('');
@@ -67,11 +75,11 @@ class _SearchbarState extends ConsumerState<Searchbar> {
               },
             ),
             contentPadding:
-                EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+                const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
             border: InputBorder.none,
           ),
-          onChanged: (query) {
-            print('Search query submitted: $query');
+          onSubmitted: (query) {
+            // Tìm kiếm khi nhấn Enter
             ref.read(searchProvider.notifier).updateQuery(query);
             ref
                 .read(teamListProvider.notifier)

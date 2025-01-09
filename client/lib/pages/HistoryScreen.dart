@@ -34,16 +34,23 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
           itemCount: history.length,
           itemBuilder: (c, i) {
             return ListTile(
-              title: GestureDetector(
-                onTap: () {
-                  ref.read(selectedTeamProvider.notifier).state =
-                      history[i].team_no;
-                  context.go('/myhome/home/myteam');
-                },
-                child: Text('${history[i].team_no}'),
-              ),
-              trailing: Text('${history[i].favorited_at}'),
-            );
+                title: GestureDetector(
+                  onTap: () {
+                    ref
+                        .read(teamListProvider.notifier)
+                        .selectTeam(history[i].team_no!);
+                    context.go('/myhome/myteam');
+                  },
+                  child: Text('${history[i].team_no}'),
+                ),
+                trailing: Text('${history[i].favorited_at}'),
+                leading: IconButton(
+                    onPressed: () {
+                      ref
+                          .read(favoriteProvider.notifier)
+                          .deleteFavorite(widget.user, history[i].team_no);
+                    },
+                    icon: Icon(Icons.delete_outline)));
           },
         ));
   }

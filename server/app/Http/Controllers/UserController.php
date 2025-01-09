@@ -4,11 +4,15 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\PasswordReset;
 use \Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log; // Thêm để sử dụng Log
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Password;
 class UserController extends Controller
 {
 
@@ -102,7 +106,4 @@ class UserController extends Controller
 
         return response()->json(['error' => 'User not authenticated.'], 401);
     }
-
-
-
- }
+}

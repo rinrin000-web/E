@@ -1,6 +1,7 @@
 import 'package:client/pages/TeamFavoriteWidget.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:client/provider/event_provider.dart';
+import 'package:client/provider/favorite_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // Dùng để parse JSON
@@ -106,9 +107,10 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
   return GestureDetector(
     onTap: () {
       ref.read(selectedTeamProvider.notifier).state = team.team_no;
+      // ref.read(selectedTeamProvider);
       context.push('/myhome/myteam');
 
-      print(team.team_no);
+      print('team duoc chon ${team.team_no}');
     },
     child: Container(
       padding: const EdgeInsets.all(1),
@@ -155,6 +157,9 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
                             ref
                                 .read(teamListProvider.notifier)
                                 .deleteTeams(team.team_no);
+                            ref
+                                .read(favoriteProvider.notifier)
+                                .deleteFavorite(user, team.team_no);
                           },
                         )
                       : SizedBox.shrink(),

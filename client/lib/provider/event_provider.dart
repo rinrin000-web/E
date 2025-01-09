@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 class Event {
   final int id;
@@ -87,6 +88,43 @@ class EventsNotifier extends StateNotifier<List<Event>> {
     } catch (e) {
       print('Error occurred: $e');
       throw Exception('Failed to load events');
+    }
+  }
+
+  Future<void> updateEvents({
+    required int? eventId,
+    String? event_name,
+    String? event_date,
+    Uint8List? imageBytes,
+  }) async {
+    try {
+      var request =
+          http.MultipartRequest('POST', Uri.parse('$baseUrl/$eventId'));
+
+      if (event_name?.isNotEmpty ?? false) {
+        request.fields['event_name'] = event_name!;
+      }
+      if (event_date?.isNotEmpty ?? false) {
+        request.fields['event_date'] = event_date!;
+      }
+      if (imageBytes != null) {
+        request.files.add(http.MultipartFile.fromBytes(
+          'images',
+          imageBytes,
+          filename: 'event_image.jpg',
+        ));
+      }
+      var response = await request.send();
+
+      if (response.statusCode == 200) {
+        var responseData = await response.stream.bytesToString();
+        var data = json.decode(responseData);
+        print(data);
+      } else {
+        print('Failed to post data: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error posting data: $e');
     }
   }
 

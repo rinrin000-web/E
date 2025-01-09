@@ -55,7 +55,7 @@ class FloorNotifier extends StateNotifier<List<Floor>> {
           'contents': contents,
         }),
       );
-      if (response.statusCode == 200) {
+      if (response.statusCode == 201) {
         // List<dynamic> body = json.decode(response.body);
         // state = body.map((json) => Floor.fromJson(json)).toList();
         return Floor.fromJson(json.decode(response.body));
@@ -91,17 +91,21 @@ class FloorNotifier extends StateNotifier<List<Floor>> {
     }
   }
 
-  Future<void> deleteFloors(String floor_no) async {
+  Future<void> deleteFloors(String floorNo) async {
     try {
-      final response = await http.delete(Uri.parse('$baseUrl/$floor_no'));
+      final response = await http
+          .delete(Uri.parse('http://127.0.0.1:8000/api/floors/$floorNo'));
       if (response.statusCode == 200) {
-        state = state.where((floors) => floors.floor_no != floor_no).toList();
-        print("floor_no deleted successfully");
+        // Xóa thành công
+        print('Floor deleted successfully');
       } else {
-        throw Exception('Failed to delete floor_no');
+        // Lỗi chi tiết từ server
+        print('Failed to delete floor: ${response.body}');
+        throw Exception('Failed to delete floor');
       }
     } catch (e) {
-      throw Exception('Failed to delete floor_no');
+      print('Error deleting floor: $e');
+      rethrow;
     }
   }
 }

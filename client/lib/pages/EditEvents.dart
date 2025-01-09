@@ -7,15 +7,16 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 
-class UpdateTeams extends ConsumerStatefulWidget {
-  UpdateTeams({Key? key}) : super(key: key);
+class EditEvents extends ConsumerStatefulWidget {
+  EditEvents({Key? key}) : super(key: key);
 
   @override
-  _UpdateTeamsState createState() => _UpdateTeamsState();
+  _EditEventsState createState() => _EditEventsState();
 }
 
-class _UpdateTeamsState extends ConsumerState<UpdateTeams> {
-  final TextEditingController _floorController = TextEditingController();
+class _EditEventsState extends ConsumerState<EditEvents> {
+  final TextEditingController _eventNameController = TextEditingController();
+  final TextEditingController _eventDateController = TextEditingController();
 
   // String? _floorNoError;
   // String? _imageError;
@@ -59,7 +60,6 @@ class _UpdateTeamsState extends ConsumerState<UpdateTeams> {
   @override
   Widget build(BuildContext context) {
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
-    final teamNo = ref.read(selectedTeamProvider);
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
@@ -67,10 +67,21 @@ class _UpdateTeamsState extends ConsumerState<UpdateTeams> {
         child: Column(
           children: [
             TextFormField(
-              controller: _floorController,
+              controller: _eventNameController,
               decoration: InputDecoration(
-                labelText: 'Floor Number',
-                hintText: '7',
+                labelText: 'Ename',
+                hintText: 'E',
+                border: const UnderlineInputBorder(),
+                // errorText: _floorNoError, // Hiển thị lỗi
+              ),
+              keyboardType: TextInputType.number,
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _eventDateController,
+              decoration: InputDecoration(
+                labelText: 'date',
+                hintText: '2024/12/12',
                 border: const UnderlineInputBorder(),
                 // errorText: _floorNoError, // Hiển thị lỗi
               ),
@@ -100,32 +111,32 @@ class _UpdateTeamsState extends ConsumerState<UpdateTeams> {
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: () {
-                // if (_validateForm()) {
-                ref.read(teamListProvider.notifier).updateTeams(
-                      teamNo,
-                      floorNo: _floorController.text.isNotEmpty
-                          ? _floorController.text
+                ref.read(eventProvider.notifier).updateEvents(
+                      eventId: eventId,
+                      event_name: _eventNameController.text.isNotEmpty
+                          ? _eventNameController.text
+                          : null,
+                      event_date: _eventDateController.text.isNotEmpty
+                          ? _eventDateController.text
                           : null,
                       imageBytes: _imageBytes,
                     );
 
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Team created successfully!')),
+                  const SnackBar(content: Text('Event updated successfully!')),
                 );
-                // }
+                context.pop();
               },
-              child: const Text('Submit'),
+              child: Text('Update Event'),
             ),
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: FloatingActionButton(
         onPressed: () {
-          context.go('/myhome/home/profifeIma');
-          print('context: $context');
+          context.go('/event');
         },
-        icon: const Icon(Icons.arrow_forward),
-        label: Text('memeberImagesSet'),
+        child: const Icon(Icons.arrow_back),
       ),
     );
   }

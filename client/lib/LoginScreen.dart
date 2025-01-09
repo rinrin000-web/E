@@ -1,10 +1,12 @@
+import 'package:client/LoginScreen.dart';
 import 'package:client/pages/EventScreen.dart';
-import 'package:client/RegisterScreen.dart';
+import 'package:client/pages/RegisterScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'provider/auth_provider.dart';
+import 'package:client/provider/auth_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:client/pages/constants.dart';
 
 class LoginScreen extends ConsumerWidget {
   final TextEditingController emailController = TextEditingController();
@@ -26,17 +28,9 @@ class LoginScreen extends ConsumerWidget {
     );
 
     // Lấy trạng thái lỗi từ provider
-    final errorMessage =
-        ref.watch(authProvider.select((state) => state.errorMessage));
-    // final authState = ref.watch(authProvider); // Lấy trạng thái đăng nhập
+    // final errorMessage =
+    //     ref.watch(authProvider.select((state) => state.errorMessage));
 
-    // // Nếu đã đăng nhập, chuyển đến màn hình chính
-    // if (authState.isAuthenticated) {
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     Navigator.pushReplacementNamed(
-    //         context, '/event'); // Chuyển đến EventScreen
-    //   });
-    // }
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -58,7 +52,7 @@ class LoginScreen extends ConsumerWidget {
                     child: TextField(
                       controller: emailController,
                       textAlign: TextAlign.start,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'email',
                         labelStyle: TextStyle(
                           fontSize: 20,
@@ -85,7 +79,7 @@ class LoginScreen extends ConsumerWidget {
                     child: TextField(
                       controller: passwordController,
                       textAlign: TextAlign.start,
-                      decoration: const InputDecoration(
+                      decoration: InputDecoration(
                         labelText: 'password',
                         labelStyle: TextStyle(
                           fontSize: 20,
@@ -115,13 +109,14 @@ class LoginScreen extends ConsumerWidget {
                         await prefs.setString(
                             'token', 'user_token'); // Lưu token giả
 
-                        // Navigator.pushReplacementNamed(context, '/event');
-                        // context.push('/event');
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EventScreen()),
-                        );
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => EventScreen()),
+                        // );
+                        // context.go('/event');
+                        //
+                        context.go('/event');
                       } catch (e) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(content: Text('ログイン失敗: $e')),
@@ -142,10 +137,34 @@ class LoginScreen extends ConsumerWidget {
                   const SizedBox(
                     height: 15,
                   ),
+                  // TextButton(
+                  //     onPressed: () {
+                  //       // Navigator.pushReplacement(
+                  //       //   context,
+                  //       //   MaterialPageRoute(
+                  //       //       builder: (context) => RegisterScreen()),
+                  //       // );
+                  //       context.go('/forgotPassword');
+                  //       // Navigator.push(
+                  //       //   context,
+                  //       //   MaterialPageRoute(
+                  //       //       builder: (context) => RegisterScreen()),
+                  //       // );
+                  //     },
+                  //     child: Text('forgotpassword')),
                   TextButton(
                       onPressed: () {
-                        // Navigator.pushReplacementNamed(context, '/signup');
-                        context.push('/signup');
+                        // Navigator.pushReplacement(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => RegisterScreen()),
+                        // );
+                        context.go('/signup');
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //       builder: (context) => RegisterScreen()),
+                        // );
                       },
                       child: Text('signup'))
                 ],

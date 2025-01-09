@@ -121,15 +121,23 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     }
   }
 
-  Future<void> updateTeams(
-      String? teamNo, String floorNo, Uint8List imageBytes) async {
+  Future<void> updateTeams(String? teamNo,
+      {String? floorNo, Uint8List? imageBytes}) async {
     try {
       var request = http.MultipartRequest('POST',
-          Uri.parse('http://127.0.0.1:8000/api/teams/update-image/$teamNo'))
-        // ..fields['team_no'] = teamNo
-        ..fields['floor_no'] = floorNo
-        ..files.add(http.MultipartFile.fromBytes('teamfileimages', imageBytes,
-            filename: 'team_image.jpg'));
+          Uri.parse('http://127.0.0.1:8000/api/teams/update-image/$teamNo'));
+
+      if (floorNo != null && floorNo.isNotEmpty) {
+        request.fields['floor_no'] = floorNo;
+      }
+
+      if (imageBytes != null) {
+        request.files.add(http.MultipartFile.fromBytes(
+          'teamfileimages',
+          imageBytes,
+          filename: 'team_image.jpg',
+        ));
+      }
 
       var response = await request.send();
 
@@ -162,16 +170,75 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     }
   }
 
-  void searchByTeamNo(String teamNo, int? id) {
-    if (teamNo.isEmpty) {
-      // fetchTeams();
-      fetchTeamsbyId(id);
-    } else {
-      state = state
-          .where((team) => team.team_no?.contains(teamNo) ?? false)
-          .toList();
+  // void searchByTeamNo(String teamNo, int? id) async {
+  //   try {
+  //     if (teamNo.isEmpty) {
+  //       // Nếu chuỗi tìm kiếm trống, tải lại danh sách đầy đủ từ API
+  //       await fetchTeamsbyId(id);
+  //     } else {
+  //       // Lọc danh sách từ state hiện tại (danh sách đầy đủ đã được tải trước đó)
+  //       state = state
+  //           .where((team) =>
+  //               team.team_no != null && team.team_no!.contains(teamNo))
+  //           .toList();
+
+  //       // Kiểm tra nếu không tìm thấy kết quả, gọi API để đảm bảo dữ liệu mới nhất
+  //       if (state.isEmpty) {
+  //         await fetchTeamsbyId(id);
+  //         // state = state
+  //         //     .where((team) =>
+  //         //         team.team_no != null && team.team_no!.contains(teamNo))
+  //         //     .toList();
+  //         state = state
+  //             .where((team) => team.team_no != null && team.team_no! == teamNo)
+  //             .toList();
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print('Error searching by team_no: $e');
+  //   }
+  // }
+  Future<void> searchByTeamNo(String teamNo, int? eventId) async {
+    try {
+      if (teamNo.isEmpty) {
+        await fetchTeamsbyId(eventId);
+      } else {
+        state = state.where((team) => team.team_no!.contains(teamNo)).toList();
+
+        if (state.isEmpty) {
+          await fetchTeamsbyId(eventId);
+          state = state.where((team) => team.team_no == teamNo).toList();
+        }
+      }
+    } catch (e) {
+      print('Error searching by team_no: $e');
     }
   }
+  // Future<void> searchByTeamNo(String teamNo, int? eventId) async {
+  //   try {
+  //     // Nếu teamNo là rỗng, tải lại danh sách đội từ server
+  //     if (teamNo.isEmpty) {
+  //       await fetchTeamsbyId(eventId);
+  //     } else {
+  //       // Kiểm tra nếu state đã có giá trị và không rỗng
+  //       if (state.isNotEmpty) {
+  //         // Nếu state không trống, tức là bạn đã chọn đội để xem, không thay đổi trạng thái
+  //         return; // Dừng ngay, không làm gì cả
+  //       }
+
+  //       // Nếu không có đội nào được chọn và tìm kiếm theo teamNo
+  //       state = state.where((team) => team.team_no!.contains(teamNo)).toList();
+
+  //       // Nếu không tìm thấy đội nào, tải lại danh sách đội và tìm lại theo teamNo
+  //       if (state.isEmpty) {
+  //         await fetchTeamsbyId(eventId);
+  //         state = state.where((team) => team.team_no == teamNo).toList();
+  //       }
+  //     }
+  //   } catch (e) {
+  //     print('Error searching by team_no: $e');
+  //   }
+  // }
 
   Future<void> getRank(String? teamNo, int? id) async {
     try {

@@ -3,9 +3,9 @@ import 'package:client/provider/memberImages_provider.dart';
 import 'package:client/provider/team_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
+import 'package:go_router/go_router.dart';
 import 'dart:typed_data';
 
 class PRIUpdate extends ConsumerStatefulWidget {
@@ -16,34 +16,93 @@ class PRIUpdate extends ConsumerStatefulWidget {
 }
 
 class _PRIUpdateState extends ConsumerState<PRIUpdate> {
-  List<XFile>? _images = [];
-  List<Uint8List> _imageBytesList = [];
+  List<XFile>? _newImages = []; // Danh sách ảnh mới được chọn
+  List<Uint8List> _newImageBytesList = []; // Danh sách bytes ảnh mới
 
-  Future<void> _pickImages() async {
-    final picker = ImagePicker();
-    final pickedFiles =
-        await picker.pickMultiImage(); // For picking multiple images
-
-    if (pickedFiles != null) {
-      if (kIsWeb) {
-        for (var pickedFile in pickedFiles) {
-          final imageBytes = await pickedFile.readAsBytes();
-          setState(() {
-            _images?.add(pickedFile);
-            _imageBytesList.add(imageBytes);
-          });
-        }
-      } else {
-        setState(() {
-          _images?.addAll(pickedFiles);
-        });
-      }
-    }
+  @override
+  void initState() {
+    super.initState();
+    // Load ảnh từ API
+    final teamNo = ref.read(selectedTeamProvider);
+    ref.read(memberImagesProvider.notifier).fetchMemberImages(teamNo);
   }
 
   @override
   Widget build(BuildContext context) {
     final teamNo = ref.read(selectedTeamProvider);
+    final memberImagesList = ref.watch(memberImagesProvider); // Ảnh từ API
+
+    // Kết hợp ảnh từ API và ảnh mới
+    final combinedImages = [
+      ...memberImagesList.map((img) => img.memberfileimages),
+      ..._newImages?.map((img) => kIsWeb ? null : img.path) ?? [],
+    ];
+    Future<void> _pickImage(int index, bool isApiImage) async {
+      final picker = ImagePicker();
+      final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+      if (pickedFile != null) {
+        if (kIsWeb) {
+          // Flutter Web: sử dụng readAsBytes()
+          final imageBytes = await pickedFile.readAsBytes();
+          setState(() {
+            if (isApiImage) {
+              ref.read(memberImagesProvider.notifier).update(
+                memberImagesList[index].id,
+                [imageBytes], // Sử dụng bytes trực tiếp thay vì File
+              ).then((_) {
+                ref
+                    .read(memberImagesProvider.notifier)
+                    .fetchMemberImages(teamNo);
+              });
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Images uploaded successfully!')),
+              );
+            } else if (index >= 0) {
+              final localIndex = index - memberImagesList.length;
+              if (localIndex >= 0 && localIndex < _newImageBytesList.length) {
+                _newImages![localIndex] = pickedFile;
+                _newImageBytesList[localIndex] = imageBytes;
+              }
+            } else {
+              _newImages?.add(pickedFile);
+              _newImageBytesList.add(imageBytes);
+            }
+          });
+        } else {
+          // Mobile/Desktop: sử dụng File API
+          setState(() {
+            if (isApiImage) {
+              ref.read(memberImagesProvider.notifier).update(
+                memberImagesList[index].id,
+                [File(pickedFile.path).readAsBytesSync()],
+              );
+            } else if (index >= 0) {
+              final localIndex = index - memberImagesList.length;
+              if (localIndex >= 0 && localIndex < _newImages!.length) {
+                _newImages![localIndex] = pickedFile;
+              }
+            } else {
+              _newImages?.add(pickedFile);
+            }
+          });
+        }
+      }
+    }
+
+    void _removeImage(int index, bool isApiImage) {
+      setState(() {
+        if (isApiImage) {
+          ref
+              .read(memberImagesProvider.notifier)
+              .deleteImages(memberImagesList[index].id);
+        } else {
+          final localIndex = index - ref.read(memberImagesProvider).length;
+          _newImages?.removeAt(localIndex);
+          if (kIsWeb) _newImageBytesList.removeAt(localIndex);
+        }
+      });
+    }
 
     return Scaffold(
       backgroundColor: Colors.transparent,
@@ -53,39 +112,64 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
           children: [
             Expanded(
               child: ListView.builder(
-                itemCount: _images?.length ?? 0,
+                itemCount: combinedImages.length + 1, // +1 cho nút thêm ảnh
                 itemBuilder: (context, index) {
-                  final image = _images![index];
-                  return kIsWeb
-                      ? Image.memory(
-                          _imageBytesList[index],
-                          width: 100,
-                          height: 300,
-                          fit: BoxFit.contain,
-                        )
-                      : Image.file(
-                          File(image.path),
-                          width: 100,
-                          height: 300,
-                          fit: BoxFit.contain,
-                        );
+                  if (index == combinedImages.length) {
+                    // Nút thêm ảnh ở cuối danh sách
+                    return IconButton(
+                      onPressed: () => _pickImage(-1, false), // Thêm ảnh mới
+                      icon: const Icon(Icons.add_outlined),
+                      iconSize: 40,
+                      color: Colors.blue,
+                    );
+                  }
+
+                  // Hiển thị ảnh từ API hoặc ảnh mới
+                  final imageUrl = combinedImages[index];
+                  final isApiImage = index < memberImagesList.length;
+
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          IconButton(
+                            onPressed: () => _pickImage(index, isApiImage),
+                            icon: const Icon(Icons.edit, color: Colors.white),
+                          ),
+                          IconButton(
+                            onPressed: () => _removeImage(index, isApiImage),
+                            icon: const Icon(Icons.delete, color: Colors.red),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 10.0),
+                        child: kIsWeb && !isApiImage
+                            ? Image.memory(
+                                _newImageBytesList[
+                                    index - memberImagesList.length],
+                                width: double.infinity,
+                                height: 250,
+                                fit: BoxFit.contain,
+                              )
+                            : Image.network(
+                                imageUrl ?? '',
+                                width: double.infinity,
+                                height: 250,
+                                fit: BoxFit.contain,
+                              ),
+                      ),
+                    ],
+                  );
                 },
               ),
             ),
-            IconButton(
-              onPressed: () {
-                setState(() {
-                  _pickImages();
-                });
-              },
-              icon: const Icon(Icons.add_outlined),
-            ),
             ElevatedButton(
               onPressed: () {
-                if (_imageBytesList.isNotEmpty) {
+                if (_newImageBytesList.isNotEmpty) {
                   ref.read(memberImagesProvider.notifier).updateImages(
                         teamNo,
-                        _imageBytesList,
+                        _newImageBytesList,
                       );
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
@@ -103,7 +187,7 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
           context.go('/myhome/home/overViewEdit');
         },
         icon: const Icon(Icons.arrow_forward),
-        label: Text('overViewEdit'),
+        label: const Text('overViewEdit'),
       ),
     );
   }

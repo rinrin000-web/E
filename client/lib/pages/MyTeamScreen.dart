@@ -25,7 +25,6 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
   @override
   Widget build(BuildContext context) {
     final selectedTeamNo = ref.watch(selectedTeamProvider);
-    print("selectedTeamNo o trang myteam: $selectedTeamNo");
     final user = ref.watch(authProvider).commentUser;
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
 
@@ -33,11 +32,8 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
     final teams = ref.watch(teamListProvider);
     final selectedTeam = teams.firstWhere(
       (team) => team.team_no == selectedTeamNo,
-      // orElse: () {
-
-      // },
     );
-    print("selectedTeamNo o trang myteam: $selectedTeamNo");
+
     final teamfileimages = ClipRRect(
         borderRadius: BorderRadius.circular(8.0),
         child: Image.network(

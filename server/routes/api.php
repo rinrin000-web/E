@@ -79,10 +79,14 @@ Route::prefix('teams')->group(function () {
     Route::delete('/{team_no}', [TeamController::class, 'destroy']);
 });
 Route::prefix('floors')->group(function () {
-    Route::post('/', [FloorController::class, 'store']);
-    Route::post('/{floor_no}', [FloorController::class, 'update']);
-    Route::delete('/{floor_no}', [FloorController::class, 'destroy']);
+    Route::get('/{event_id}', [FloorController::class, 'index']);
+    Route::post('/{event_id}', [FloorController::class, 'store']);
+    Route::post('/{floor_no}/{event_id}', [FloorController::class, 'update']);
+    Route::post('/reset/reset/{event_id}', [FloorController::class, 'resetFakeUserCount']);
+    Route::post('/updateUserCount/{floor_no}/{event_id}', [FloorController::class, 'updateUserCount']);
+    Route::delete('/{floor_no}/{event_id}', [FloorController::class, 'destroy']);
     Route::get('/getFloorTeamCount/{event_id}', [FloorController::class, 'getFloorTeamCount']);
+
 });
 
 Route::get('/user/location/{email?}', [UserLocationController::class, 'show']);

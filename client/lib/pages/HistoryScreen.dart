@@ -41,9 +41,13 @@ class _HistoryScreenState extends ConsumerState<HistoryScreen> {
                         .selectTeam(history[i].team_no!);
                     context.go('/myhome/myteam');
                   },
-                  child: Text('${history[i].team_no}'),
+                  child: Text(
+                    '${history[i].team_no}',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+                  ),
                 ),
-                trailing: Text('${history[i].favorited_at}'),
+                trailing: Text('${history[i].favorited_at}',
+                    style: TextStyle(fontSize: 16)),
                 leading: IconButton(
                     onPressed: () {
                       ref

@@ -1,4 +1,5 @@
 import 'package:client/pages/TeamList.dart';
+import 'package:client/pages/search_bar.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -28,6 +29,7 @@ class _ItscreenState extends ConsumerState<Itscreen> {
   @override
   Widget build(BuildContext context) {
     final teams = ref.watch(teamListProvider);
+    final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
     // final user = ref.watch(authProvider).commentUser;
 
     // Lọc các đội có team_no bắt đầu bằng 'I'
@@ -47,31 +49,23 @@ class _ItscreenState extends ConsumerState<Itscreen> {
       height: 80,
       fit: BoxFit.contain,
     );
-    return Center(
-      child: Container(
+    return Scaffold(
+      backgroundColor: Colors.transparent,
+      body: Container(
         padding: const EdgeInsets.all(10.0),
         height: MediaQuery.of(context).size.height,
-        alignment: Alignment.center,
+        // alignment: Alignment.center,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
+          // mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Row(
-              children: [
-                const Text(
-                  'IT系',
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 29,
-                  ),
-                ),
-                const SizedBox(
-                  width: 10,
-                ),
-                Text(
-                  '( ${filteredTeams.length} ) ',
-                ),
-              ],
+            Searchbar(eventId: eventId),
+            const SizedBox(
+              height: 10,
+            ),
+            Text(
+              '( ${filteredTeams.length} ) ',
+              textAlign: TextAlign.start,
             ),
             Expanded(child: list)
           ],

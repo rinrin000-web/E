@@ -57,34 +57,70 @@ class UserController extends Controller
         return response()->json(['error' => 'Login failed! Invalid credentials.'], Response::HTTP_UNAUTHORIZED);
     }
 
-    public function signup(Request $req){
-        $rules = array(
-            'email' => 'required|email|unique:users',
-            "password" =>"required|min:6"
-        );
-        $validator = Validator::make($req->all(),$rules);
-        if($validator ->fails())
-        {
-            return $validator->errors();
-        }
-        else
-        {
-            $user = User::create([
-                'email' => $req->email,
-                'password' => Hash::make($req->password),
-                'is_admin' => 0,
-            ]);
-            $result=$user->save();
 
-            if($result){
-                return ["result" =>"User registered successfully!"];
-            }
-            else
-            {
-                return ["result" =>"operation failed"];
-            }
-        }
+    // public function signup(Request $req){
+    //     $rules = array(
+    //         'email' => 'required|email|unique:users',
+    //         "password" =>"required|min:6"
+    //     );
+    //     $validator = Validator::make($req->all(),$rules);
+    //     if($validator ->fails())
+    //     {
+    //         return $validator->errors();
+    //     }
+    //     else
+    //     {
+    //         $user = User::create([
+    //             'email' => $req->email,
+    //             'password' => Hash::make($req->password),
+    //             'is_admin' => 0,
+    //         ]);
+    //         $result=$user->save();
+
+    //         if($result){
+    //             return ["result" =>"User registered successfully!"];
+    //         }
+    //         else
+    //         {
+    //             return ["result" =>"operation failed"];
+    //         }
+    //     }
+    // }
+    public function signup(Request $req)
+{
+    $rules = [
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:6',
+    ];
+
+    $validator = Validator::make($req->all(), $rules);
+
+    if ($validator->fails()) {
+        return response()->json($validator->errors(), 422); // バリデーションエラーを返す
     }
+
+    $user = User::create([
+        'email' => $req->email,
+        'password' => Hash::make($req->password),
+        'is_admin' => 0,
+    ]);
+
+    if ($user) {
+        // 登録後にトークンを生成して返す
+        $user->api_token = Str::random(60);
+        $user->save();
+
+        return response()->json([
+            'result' => 'User registered successfully!',
+            'token' => $user->api_token,
+            'user_id' => $user->user_id,
+            'email' => $user->email,
+        ], Response::HTTP_CREATED);
+    } else {
+        return response()->json(['result' => 'Operation failed'], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+
 
     // public function logout()
     // {

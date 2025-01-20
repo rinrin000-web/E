@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/pages/TeamList.dart';
@@ -45,7 +46,7 @@ class Comment {
 
 class CommentNotifier extends StateNotifier<List<Comment>> {
   CommentNotifier() : super([]);
-  final String baseUrl = 'http://127.0.0.1:8000/api/comments';
+  final String baseUrl = '${BaseUrlE.baseUrl}/api/comments';
   Future<List<Comment>> fetchComment(String? teamNo) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/$teamNo'));

@@ -22,6 +22,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:client/pages/constants.dart';
 
 void main() {
   runApp(
@@ -188,8 +189,7 @@ class MyApp extends ConsumerWidget {
         child: Container(
           decoration: const BoxDecoration(
             image: DecorationImage(
-              image: AssetImage(
-                  'assets/images/BackgroundPageI.png'), // Đặt ảnh nền
+              image: ColorE.backgroundImage, // Đặt ảnh nền
               fit: BoxFit.fill, // Ảnh nền phủ toàn bộ màn hình
             ),
           ),

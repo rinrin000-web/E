@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/pages/TeamList.dart';
@@ -20,7 +21,7 @@ class User {
 class UserLocationNotifier extends StateNotifier<List<User>> {
   UserLocationNotifier() : super([]);
 
-  final String baseUrl = 'http://127.0.0.1:8000/api/user/location';
+  final String baseUrl = '${BaseUrlE.baseUrl}/api/user/location';
 
   Future<void> fetchUserLocation(String? email) async {
     final response = await http.get(Uri.parse('$baseUrl/$email'));

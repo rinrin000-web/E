@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:convert';
@@ -19,9 +20,11 @@ class TeamList {
     return TeamList(
       team_no: json['team_no'],
       floor: json['floor_no'].toString() + 'F', // Chuyển đổi thành floor string
-      rank: json['rank'] ?? 0.0,
-      teamfileimages:
-          'http://127.0.0.1:8000/api/teams/${json['teamfileimages']}',
+      rank: (json['rank'] is int
+              ? (json['rank'] as int).toDouble()
+              : json['rank']) ??
+          0.0,
+      teamfileimages: '${BaseUrlE.baseUrl}/api/teams/${json['teamfileimages']}',
     );
   }
 
@@ -72,8 +75,8 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
 
   Future<void> fetchTeamsbyId(int? id) async {
     try {
-      final response = await http
-          .get(Uri.parse('http://127.0.0.1:8000/api/teams/events/$id'));
+      final response =
+          await http.get(Uri.parse('${BaseUrlE.baseUrl}/api/teams/events/$id'));
 
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
@@ -101,7 +104,7 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
       int? eventId, String teamNo, String floorNo, Uint8List imageBytes) async {
     try {
       var request = http.MultipartRequest(
-          'POST', Uri.parse('http://127.0.0.1:8000/api/teams/$eventId'))
+          'POST', Uri.parse('${BaseUrlE.baseUrl}/api/teams/$eventId'))
         ..fields['team_no'] = teamNo
         ..fields['floor_no'] = floorNo
         ..files.add(http.MultipartFile.fromBytes('teamfileimages', imageBytes,
@@ -125,7 +128,7 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
       {String? floorNo, Uint8List? imageBytes}) async {
     try {
       var request = http.MultipartRequest('POST',
-          Uri.parse('http://127.0.0.1:8000/api/teams/update-image/$teamNo'));
+          Uri.parse('${BaseUrlE.baseUrl}/api/teams/update-image/$teamNo'));
 
       if (floorNo != null && floorNo.isNotEmpty) {
         request.fields['floor_no'] = floorNo;
@@ -156,7 +159,7 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
   Future<void> deleteTeams(String? team_no) async {
     try {
       final response = await http
-          .delete(Uri.parse('http://127.0.0.1:8000/api/teams/$team_no'));
+          .delete(Uri.parse('${BaseUrlE.baseUrl}/api/teams/$team_no'));
       if (response.statusCode == 200) {
         // Remove the deleted event from the state
         state = state.where((teams) => teams.team_no != team_no).toList();
@@ -170,28 +173,16 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     }
   }
 
-  // void searchByTeamNo(String teamNo, int? id) async {
+  // Future<void> searchByTeamNo(String teamNo, int? eventId) async {
   //   try {
   //     if (teamNo.isEmpty) {
-  //       // Nếu chuỗi tìm kiếm trống, tải lại danh sách đầy đủ từ API
-  //       await fetchTeamsbyId(id);
+  //       await fetchTeamsbyId(eventId);
   //     } else {
-  //       // Lọc danh sách từ state hiện tại (danh sách đầy đủ đã được tải trước đó)
-  //       state = state
-  //           .where((team) =>
-  //               team.team_no != null && team.team_no!.contains(teamNo))
-  //           .toList();
+  //       state = state.where((team) => team.team_no!.contains(teamNo)).toList();
 
-  //       // Kiểm tra nếu không tìm thấy kết quả, gọi API để đảm bảo dữ liệu mới nhất
   //       if (state.isEmpty) {
-  //         await fetchTeamsbyId(id);
-  //         // state = state
-  //         //     .where((team) =>
-  //         //         team.team_no != null && team.team_no!.contains(teamNo))
-  //         //     .toList();
-  //         state = state
-  //             .where((team) => team.team_no != null && team.team_no! == teamNo)
-  //             .toList();
+  //         await fetchTeamsbyId(eventId);
+  //         state = state.where((team) => team.team_no == teamNo).toList();
   //       }
   //     }
   //   } catch (e) {
@@ -203,48 +194,28 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
       if (teamNo.isEmpty) {
         await fetchTeamsbyId(eventId);
       } else {
-        state = state.where((team) => team.team_no!.contains(teamNo)).toList();
+        final searchResult =
+            state.where((team) => team.team_no!.contains(teamNo)).toList();
 
-        if (state.isEmpty) {
-          await fetchTeamsbyId(eventId);
-          state = state.where((team) => team.team_no == teamNo).toList();
+        if (searchResult.isEmpty) {
+          // Nếu không tìm thấy team nào, giữ nguyên trạng thái state
+          print(
+              'No team found with team_no: $teamNo. Keeping previous display.');
+        } else {
+          // Nếu tìm thấy team, cập nhật state
+          state = searchResult;
         }
       }
     } catch (e) {
       print('Error searching by team_no: $e');
     }
   }
-  // Future<void> searchByTeamNo(String teamNo, int? eventId) async {
-  //   try {
-  //     // Nếu teamNo là rỗng, tải lại danh sách đội từ server
-  //     if (teamNo.isEmpty) {
-  //       await fetchTeamsbyId(eventId);
-  //     } else {
-  //       // Kiểm tra nếu state đã có giá trị và không rỗng
-  //       if (state.isNotEmpty) {
-  //         // Nếu state không trống, tức là bạn đã chọn đội để xem, không thay đổi trạng thái
-  //         return; // Dừng ngay, không làm gì cả
-  //       }
-
-  //       // Nếu không có đội nào được chọn và tìm kiếm theo teamNo
-  //       state = state.where((team) => team.team_no!.contains(teamNo)).toList();
-
-  //       // Nếu không tìm thấy đội nào, tải lại danh sách đội và tìm lại theo teamNo
-  //       if (state.isEmpty) {
-  //         await fetchTeamsbyId(eventId);
-  //         state = state.where((team) => team.team_no == teamNo).toList();
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print('Error searching by team_no: $e');
-  //   }
-  // }
 
   Future<void> getRank(String? teamNo, int? id) async {
     try {
       // Send the request to the API
-      final response = await http.get(
-          Uri.parse('http://127.0.0.1:8000/api/teams/getRank/$teamNo/$id'));
+      final response = await http
+          .get(Uri.parse('${BaseUrlE.baseUrl}/api/teams/getRank/$teamNo/$id'));
 
       // Log the response body for debugging
       print('API Response: ${response.body}');

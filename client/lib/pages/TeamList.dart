@@ -1,4 +1,5 @@
 import 'package:client/pages/TeamFavoriteWidget.dart';
+import 'package:client/pages/constants.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/favorite_provider.dart';
@@ -30,14 +31,13 @@ class TeamRankWidget extends ConsumerWidget {
 
       return RatingBar.builder(
         initialRating: teamRank.rank.toDouble(),
-        itemBuilder: (context, index) => const Icon(
-          Icons.star,
-          color: Color(0xffFD8B51),
-        ),
+        itemBuilder: (context, index) => const Icon(Icons.star,
+            // color: Color(0xffFD8B51),
+            color: ColorE.rankColorE),
         onRatingUpdate: (rating) {},
         itemCount: 5,
         allowHalfRating: true,
-        unratedColor: const Color.fromARGB(255, 81, 139, 187),
+        unratedColor: ColorE.searchColorE,
         itemSize: 20,
         ignoreGestures: true,
       );
@@ -73,23 +73,6 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
   final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
   print("evenId : ${eventId}");
   final text = Text('${team.floor}');
-
-  // final icon_rank = RatingBar.builder(
-  //   itemBuilder: (context, index) => const Icon(
-  //     Icons.star,
-  //     color: Color(0xffFD8B51),
-  //   ),
-  //   onRatingUpdate: (rating) {
-  //     print('rank: $rating');
-  //   },
-  //   initialRating: team.rank.toDouble(),
-  //   itemCount: 5,
-  //   allowHalfRating: true,
-  //   unratedColor: Colors.blue[100],
-  //   itemSize: 20,
-  //   ignoreGestures: true,
-  // );
-  // print('Image URL: ${team.image}');
 
   final images = ClipRRect(
       borderRadius: BorderRadius.circular(8.0),

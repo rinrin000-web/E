@@ -16,7 +16,7 @@ class FloorGuideEdit extends ConsumerWidget {
     void saveFloor() async {
       try {
         // Fetch the current list of floors
-        await floorNotifier.fetchFloor(eventId);
+        await floorNotifier.fetchFloorcount(eventId!);
 
         // Kiểm tra sự tồn tại của floor_no trong danh sách
         bool floorExists = ref
@@ -25,13 +25,15 @@ class FloorGuideEdit extends ConsumerWidget {
 
         if (floorExists) {
           // Nếu tồn tại, gọi hàm update
-          await floorNotifier.updateFloor(_floor_no.text, _contents.text);
+          await floorNotifier.updateFloor(
+              _floor_no.text, eventId!, _contents.text);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Floor updated successfully!')),
           );
         } else {
           // Nếu không tồn tại, gọi hàm create
-          await floorNotifier.createFloor(_floor_no.text, _contents.text);
+          await floorNotifier.createFloor(
+              eventId!, _floor_no.text, _contents.text);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text('Floor created successfully!')),
           );
@@ -68,7 +70,17 @@ class FloorGuideEdit extends ConsumerWidget {
                 ),
                 ElevatedButton.icon(
                   onPressed: () {
-                    floorNotifier.deleteFloors(_floor_no.text);
+                    try {
+                      floorNotifier.deleteFloor(_floor_no.text, eventId!);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                            content: Text('Floor delete successfully!')),
+                      );
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Error delete floor: $e')),
+                      );
+                    }
                   },
                   icon: const Icon(Icons.delete),
                   label: const Text('delete'),

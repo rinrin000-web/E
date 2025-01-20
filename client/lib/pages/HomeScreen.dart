@@ -1,4 +1,6 @@
+import 'package:client/pages/constants.dart';
 import 'package:client/pages/createTeams.dart';
+import 'package:client/pages/search_bar.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -45,34 +47,49 @@ class _HomescreenState extends ConsumerState<Homescreen> {
       },
     );
     final echan = Image.asset(
-      'images/echan.png',
+      'assets/images/pet.png',
       height: 80,
       fit: BoxFit.contain,
     );
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
-        padding: const EdgeInsets.all(10.0),
+        padding: const EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
         height: MediaQuery.of(context).size.height,
         child: Stack(
           children: [
-            list,
+            Positioned(
+              top: 0,
+              left: 0,
+              right: 0,
+              child: Searchbar(eventId: eventId),
+            ),
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.only(top: 50),
+                child: list,
+              ),
+            ),
+            // list,
             if (user != 'admin@gmail.com')
               Positioned(
-                  bottom: 10,
+                  bottom: 0,
                   // right: 10,
-                  child: Row(
-                    children: [
-                      echan,
-                      const SizedBox(
-                        width: 10,
-                      ),
-                      CurrentfloorCheck(
-                        user: user,
-                        eventId: eventId,
-                      )
-                    ],
-                  ))
+                  child: Container(
+                      color: ColorE.backgroundColorE,
+                      padding: const EdgeInsets.only(top: 5.0),
+                      child: Row(
+                        children: [
+                          echan,
+                          const SizedBox(
+                            width: 10,
+                          ),
+                          CurrentfloorCheck(
+                            user: user,
+                            eventId: eventId,
+                          )
+                        ],
+                      )))
           ],
         ),
       ),

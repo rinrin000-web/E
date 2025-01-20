@@ -21,7 +21,7 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
   void initState() {
     super.initState();
     final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
-    ref.read(floorProvider.notifier).fetchFloor(eventId);
+    ref.read(floorProvider.notifier).fetchFloor(eventId!);
     ref.read(userLocationProvider.notifier).fetchUserLocation(widget.user);
   }
 
@@ -33,7 +33,7 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
         .read(userLocationProvider.notifier)
         .updateUserLocation(widget.user!, floorNo);
     final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
-    await ref.read(floorProvider.notifier).fetchFloor(eventId);
+    await ref.read(floorProvider.notifier).fetchFloor(eventId!);
   }
 
   @override

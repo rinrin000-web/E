@@ -1,6 +1,8 @@
 import 'package:client/LoginScreen.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:client/provider/event_provider.dart';
+import 'package:client/provider/fake_usercount_provider.dart';
+import 'package:client/provider/floor_provider.dart';
 import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -9,6 +11,7 @@ import 'package:client/provider/navigation_provider.dart.dart';
 import 'package:client/pages/search_bar.dart';
 import 'package:client/provider/search_provider.dart';
 import 'package:client/provider/emailVisibility_provider.dart';
+import 'package:client/pages/constants.dart';
 
 class Myhome extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -23,49 +26,85 @@ class Myhome extends ConsumerWidget {
     final user = ref.watch(authProvider).commentUser;
 
     final isPublic = ref.watch(emailVisibilityProvider);
-
+    // final String title_text = "ホーム";
+    // // void _onItemTapped(int index) {
+    // //   ref.read(tabIndexProvider.notifier).setTabIndex(index);
+    // //   if (index == 0) {
+    // //     navigationShell.goBranch(index, initialLocation: true);
+    // //   } else {
+    // //     navigationShell.goBranch(index);
+    // //   }
+    // // }
     // void _onItemTapped(int index) {
-    //   ref.read(tabIndexProvider.notifier).setTabIndex(index);
-    //   if (index == 0) {
-    //     navigationShell.goBranch(index, initialLocation: true);
-    //   } else {
-    //     navigationShell.goBranch(index);
+    //   ref.read(tabIndexProvider.notifier).setTabIndex(index); // Cập nhật tab
+    //   // Điều hướng đến trang tương ứng dựa trên index
+    //   switch (index) {
+    //     case 0:
+    //       context.go('/myhome/home');
+    //       title_text = 'ホーム';
+    //       break;
+    //     case 1:
+    //       context.go('/myhome/it');
+    //       title_text = 'IT';
+    //       break;
+    //     case 2:
+    //       context.go('/myhome/web');
+    //       title_text = 'WEB系';
+    //       break;
+    //     case 3:
+    //       context.go('/myhome/floor');
+    //       title_text = 'フロアガイド';
+    //       break;
+    //     case 4:
+    //       context.go('/myhome/favorite');
+    //       title_text = '気に入り';
+    //       break;
+    //     default:
+    //       break;
     //   }
     // }
+    final titles = ["ホーム", "IT系", "WEB系", "フロアガイド", "気に入り"];
+    final currentTitle = titles[selectedIndex];
+
     void _onItemTapped(int index) {
-      ref.read(tabIndexProvider.notifier).setTabIndex(index); // Cập nhật tab
-      // Điều hướng đến trang tương ứng dựa trên index
-      switch (index) {
-        case 0:
-          context.go('/myhome/home');
-          break;
-        case 1:
-          context.go('/myhome/it');
-          break;
-        case 2:
-          context.go('/myhome/web');
-          break;
-        case 3:
-          context.go('/myhome/floor');
-          break;
-        case 4:
-          context.go('/myhome/favorite');
-          break;
-        default:
-          break;
-      }
+      ref.read(tabIndexProvider.notifier).setTabIndex(index);
+      final routes = [
+        '/myhome/home',
+        '/myhome/it',
+        '/myhome/web',
+        '/myhome/floor',
+        '/myhome/favorite'
+      ];
+      context.go(routes[index]);
     }
 
     final searchQuery = ref.watch(searchProvider);
     final logoImage = Image.asset(
-      'assets/images/Logo.png',
+      'assets/images/echanlogo.png',
     );
+
     final appbar = Container(
-      padding: const EdgeInsets.fromLTRB(10.0, 5.0, 45.0, 5.0),
-      width: double.infinity * 0.8,
-      color: const Color(0xffC0E2E3),
-      child: Row(
-        children: [logoImage, const Spacer(), Searchbar(eventId: eventId)],
+      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+      width: double.infinity,
+      color: ColorE.headerColorE,
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          Align(
+            alignment: Alignment.centerLeft,
+            child: logoImage,
+          ),
+          Center(
+            child: Text(
+              currentTitle,
+              style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  // color: ColorE.backgroundColorE
+                  color: Colors.white),
+            ),
+          ),
+        ],
       ),
     );
 
@@ -176,6 +215,9 @@ class Myhome extends ConsumerWidget {
             onTap: () {
               ref.read(userLocationProvider.notifier).clearUserLocation(user);
               ref.read(authProvider.notifier).logout();
+              if (user == 'admin@gmail.com') {
+                ref.read(floorProvider.notifier).resetFakeUserCount(eventId!);
+              }
               context.go('/');
             },
           ),
@@ -196,6 +238,7 @@ class Myhome extends ConsumerWidget {
           IconButton(
             icon: const Icon(
               Icons.list,
+              color: ColorE.backgroundColorE,
               size: 35,
             ),
             onPressed: () {
@@ -209,33 +252,33 @@ class Myhome extends ConsumerWidget {
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: _onItemTapped,
-        selectedItemColor: const Color(0xff068288),
-        unselectedItemColor: const Color(0xff694702),
+        selectedItemColor: ColorE.backgroundColorE,
+        unselectedItemColor: ColorE.searchColorE,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
-            backgroundColor: Color(0xffFFCC66),
+            backgroundColor: ColorE.headerColorE,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.computer),
             label: 'IT',
-            backgroundColor: Color(0xffFFCC66),
+            backgroundColor: ColorE.headerColorE,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.web),
             label: 'Web',
-            backgroundColor: Color(0xffFFCC66),
+            backgroundColor: ColorE.headerColorE,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.map),
             label: 'Floor Guide',
-            backgroundColor: Color(0xffFFCC66),
+            backgroundColor: ColorE.headerColorE,
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.favorite_border),
             label: 'Favorite',
-            backgroundColor: Color(0xffFFCC66),
+            backgroundColor: ColorE.headerColorE,
           ),
         ],
       ),

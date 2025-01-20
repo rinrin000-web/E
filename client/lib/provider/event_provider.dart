@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
@@ -23,7 +24,7 @@ class Event {
       id: json['id'],
       event_name: json['event_name'],
       event_date: json['event_date'],
-      images: 'http://127.0.0.1:8000/api/events/${json['images']}',
+      images: '${BaseUrlE.baseUrl}/api/events/${json['images']}',
     );
   }
 
@@ -38,7 +39,7 @@ class EventsNotifier extends StateNotifier<List<Event>> {
     _loadSelectedEventId(); // Load selected event ID on initialization
   }
 
-  final String baseUrl = 'http://127.0.0.1:8000/api/events';
+  final String baseUrl = '${BaseUrlE.baseUrl}/api/events';
 
   int? _selectedEventId; // Store selected event ID
 

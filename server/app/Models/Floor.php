@@ -9,7 +9,7 @@ class Floor extends Model
 {
     protected $table = 'floors';
     protected $primaryKey = 'id';
-    protected $fillable = ['floor_no','contents'];
+    protected $fillable = ['floor_no','contents','fakeusercount','event_id'];
     use HasFactory;
     public function teams()
     {

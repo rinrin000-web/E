@@ -67,7 +67,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       throw Exception(ErrorMessages.passwordRequired);
     }
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/login'),
+      Uri.parse('${BaseUrlE.baseUrl}/api/login'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'email': email, 'password': password}),
     );
@@ -100,6 +100,8 @@ class AuthNotifier extends StateNotifier<AuthState> {
         isSignup: false,
         errorMessage: 'メールアドレスまたはパスワードを確認してください',
       );
+      print('Status Code: ${response.statusCode}');
+      print('Response Body: ${response.body}');
       throw Exception('Failed to login: ${response.body}');
     }
   }
@@ -126,17 +128,17 @@ class AuthNotifier extends StateNotifier<AuthState> {
     }
 
     final response = await http.post(
-      Uri.parse('http://127.0.0.1:8000/api/signup'),
+      Uri.parse('${BaseUrlE.baseUrl}/api/signup'),
       headers: {'Content-Type': 'application/json'},
       body: json.encode({'email': email, 'password': password}),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       final responseBody = json.decode(response.body);
       final token = responseBody['token'];
 
       if (token == null) {
-        throw Exception('Registration failed: ${responseBody}');
+        throw Exception('登録トークンが見つかりません');
       } else {
         // Lưu token vào SharedPreferences
         final prefs = await SharedPreferences.getInstance();
@@ -144,9 +146,9 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
         // Cập nhật trạng thái sau khi đăng ký thành công
         state = AuthState(
-            isAuthenticated: true,
-            isLogin: false,
-            isSignup: true,
+            isAuthenticated: false,
+            isLogin: true,
+            isSignup: false,
             errorMessage: null);
       }
     } else {
@@ -215,7 +217,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
   // }
 
   Future<void> forgotPassword(String email) async {
-    final url = Uri.parse('http://127.0.0.1:8000/api/password/reset');
+    final url = Uri.parse('${BaseUrlE.baseUrl}/api/password/reset');
     try {
       final response = await http.post(
         url,
@@ -237,7 +239,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   Future<void> resetPassword(
       String email, String password, String token) async {
-    final url = Uri.parse('http://127.0.0.1:8000/api/password/update');
+    final url = Uri.parse('${BaseUrlE.baseUrl}/api/password/update');
     try {
       final response = await http.post(
         url,

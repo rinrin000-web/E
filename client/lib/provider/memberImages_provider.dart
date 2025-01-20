@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -18,7 +19,7 @@ class MemberImages {
       id: json['id'],
       team_no: json['team_no'],
       memberfileimages:
-          'http://127.0.0.1:8000/api/memberfileimages/${json['memberfileimages']}',
+          '${BaseUrlE.baseUrl}/api/memberfileimages/${json['memberfileimages']}',
     );
   }
 }
@@ -29,7 +30,7 @@ class MemberImagesNotifier extends StateNotifier<List<MemberImages>> {
   Future<void> fetchMemberImages(teamNo) async {
     try {
       final response = await http
-          .get(Uri.parse('http://127.0.0.1:8000/api/memberfileimages/'));
+          .get(Uri.parse('${BaseUrlE.baseUrl}/api/memberfileimages/'));
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -55,7 +56,7 @@ class MemberImagesNotifier extends StateNotifier<List<MemberImages>> {
         var request = http.MultipartRequest(
             'POST',
             Uri.parse(
-                'http://127.0.0.1:8000/api/memberfileimages/update-image/$teamNo'));
+                '${BaseUrlE.baseUrl}/api/memberfileimages/update-image/$teamNo'));
 
         request.files.add(http.MultipartFile.fromBytes(
             'memberfileimages', imageBytes,
@@ -79,8 +80,8 @@ class MemberImagesNotifier extends StateNotifier<List<MemberImages>> {
   Future<void> update(int id, List<Uint8List> imageBytesList) async {
     for (var imageBytes in imageBytesList) {
       try {
-        var request = http.MultipartRequest('POST',
-            Uri.parse('http://127.0.0.1:8000/api/memberfileimages/$id'));
+        var request = http.MultipartRequest(
+            'POST', Uri.parse('${BaseUrlE.baseUrl}/api/memberfileimages/$id'));
 
         request.files.add(http.MultipartFile.fromBytes(
             'memberfileimages', imageBytes,
@@ -104,7 +105,7 @@ class MemberImagesNotifier extends StateNotifier<List<MemberImages>> {
   Future<void> deleteImages(int id) async {
     try {
       final response = await http
-          .delete(Uri.parse('http://127.0.0.1:8000/api/memberfileimages/$id'));
+          .delete(Uri.parse('${BaseUrlE.baseUrl}/api/memberfileimages/$id'));
       if (response.statusCode == 200) {
         state = state.where((memberImages) => memberImages.id != id).toList();
         print("images deleted successfully");

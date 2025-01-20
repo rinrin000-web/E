@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/pages/TeamList.dart';
@@ -29,7 +30,7 @@ class Favorite {
 
 class FavoriteNotifier extends StateNotifier<List<Favorite>> {
   FavoriteNotifier() : super([]);
-  final String baseUrl = 'http://127.0.0.1:8000/api/favorite';
+  final String baseUrl = '${BaseUrlE.baseUrl}/api/favorite';
   // Fetch and toggle the favorite status
   Future<void> fetchFavorite(String? user_email, int? event_id) async {
     try {

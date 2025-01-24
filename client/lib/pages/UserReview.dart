@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/comment_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:client/provider/emailVisibility_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UserReview extends ConsumerStatefulWidget {
   String? teamNo;
@@ -37,7 +38,7 @@ class _UserReviewState extends ConsumerState<UserReview> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Text(
+        Text(
           'ユーザレビュー',
           textAlign: TextAlign.center,
           style: TextStyle(
@@ -45,13 +46,13 @@ class _UserReviewState extends ConsumerState<UserReview> {
               fontSize: 24,
               color: Color(0xff694702)),
         ),
-        const SizedBox(height: 10),
+        SizedBox(height: 10.h),
         Expanded(
           child: ListView.builder(
             itemCount: userReview.length,
             itemBuilder: (c, i) {
               return Container(
-                height: 250,
+                height: 250.h,
                 padding: const EdgeInsets.all(8.0),
                 // child: Card(
                 // color: Colors.transparent,
@@ -60,13 +61,13 @@ class _UserReviewState extends ConsumerState<UserReview> {
                   children: [
                     Row(
                       children: [
-                        const Icon(
+                        Icon(
                           Icons.supervised_user_circle,
                           size: 30,
-                          color: Color(0xff15B1BA),
+                          color: Color.fromARGB(255, 1, 1, 1),
                         ),
-                        const SizedBox(
-                          width: 5,
+                        SizedBox(
+                          width: 5.w,
                         ),
                         Text(
                             userReview[i].comment_user == myuser
@@ -74,12 +75,12 @@ class _UserReviewState extends ConsumerState<UserReview> {
                                     ? '${userReview[i].comment_user}'
                                     : 'Euser')
                                 : '${userReview[i].comment_user}',
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontSize: 20, fontWeight: FontWeight.bold))
                       ],
                     ),
-                    const SizedBox(
-                      height: 10,
+                    SizedBox(
+                      height: 10.h,
                     ),
                     RatingBar.builder(
                       initialRating: (userReview[i].rank ?? 0).toDouble(),
@@ -88,12 +89,12 @@ class _UserReviewState extends ConsumerState<UserReview> {
                       itemCount: 5,
                       itemSize: 20,
                       ignoreGestures: true,
-                      itemBuilder: (context, _) => const Icon(Icons.star,
-                          size: 8, color: Color(0xffFFCC66)),
+                      itemBuilder: (context, _) =>
+                          Icon(Icons.star, size: 8.w, color: Color(0xffFFCC66)),
                       onRatingUpdate: (rating) {},
                     ),
-                    const SizedBox(
-                      height: 10,
+                    SizedBox(
+                      height: 10.h,
                     ),
                     ClipRRect(
                       child: Container(
@@ -161,8 +162,8 @@ class _UserReviewState extends ConsumerState<UserReview> {
                         ),
                       ),
                     ),
-                    const SizedBox(
-                      height: 5,
+                    SizedBox(
+                      height: 5.h,
                     ),
                     ClipRRect(
                       child: Container(
@@ -212,8 +213,8 @@ class _UserReviewState extends ConsumerState<UserReview> {
         },
         child: Image.asset(
           'images/backbutton.png',
-          width: 50,
-          height: 50,
+          width: 50.w,
+          height: 50.h,
         ),
         backgroundColor: Colors.transparent,
         // elevation: 0,

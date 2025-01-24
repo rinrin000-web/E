@@ -10,6 +10,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:client/provider/team_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TeamRankWidget extends ConsumerWidget {
   final String? teamNo;
@@ -79,7 +80,7 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
       child: Image.network(
         '${team.teamfileimages}',
         fit: BoxFit.contain,
-        height: 250,
+        height: 250.h,
         width: double.infinity,
         errorBuilder:
             (BuildContext context, Object error, StackTrace? stackTrace) {
@@ -114,9 +115,9 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
                 children: [
                   user == 'admin@gmail.com'
                       ? IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.edit,
-                            size: 30,
+                            // size: 30.w,
                           ),
                           onPressed: () {
                             // ref.read(selectedTeamProvider.notifier).state =
@@ -132,9 +133,9 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
                       : SizedBox.shrink(),
                   user == 'admin@gmail.com'
                       ? IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.delete_outlined,
-                            size: 30,
+                            // size: 30.w,
                           ),
                           onPressed: () {
                             ref
@@ -155,12 +156,12 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
               ) // Return an empty widget if the user is not admin
             ],
           ),
-          const SizedBox(
-            height: 5,
+          SizedBox(
+            height: 5.h,
           ),
           images,
-          const SizedBox(
-            height: 10,
+          SizedBox(
+            height: 10.h,
           ),
         ],
       ),

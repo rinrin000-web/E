@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/overview_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class OverviewScreen extends ConsumerStatefulWidget {
   final String? teamNo;
@@ -34,7 +35,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
     // }
     return SingleChildScrollView(
       child: SizedBox(
-        height: 500,
+        height: 500.h,
         child: ListView.builder(
           itemCount: overviews.length,
           itemBuilder: (c, i) {
@@ -45,10 +46,10 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
               //   subtitle: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: 10.h,
                 ),
-                const Text(
+                Text(
                   'スローガン',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -57,13 +58,12 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 ),
                 Text(
                   "${overview.slogan}",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: 10.h,
                 ),
-                const Text(
+                Text(
                   '全体企画',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -72,14 +72,14 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 ),
                 Text(
                   "${overview.overallplanning}",
-                  style: const TextStyle(
+                  style: TextStyle(
                       // fontWeight: FontWeight.bold,
                       fontSize: 15),
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: 10.h,
                 ),
-                const Text(
+                Text(
                   '▼使用技術',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -88,14 +88,14 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 ),
                 Text(
                   "${overview.techused}",
-                  style: const TextStyle(
+                  style: TextStyle(
                       // fontWeight: FontWeight.bold,
                       fontSize: 15),
                 ),
-                const SizedBox(
-                  height: 10,
+                SizedBox(
+                  height: 10.h,
                 ),
-                const Text(
+                Text(
                   '▼使用ツール・アプリ',
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
@@ -104,7 +104,7 @@ class _OverviewScreenState extends ConsumerState<OverviewScreen> {
                 ),
                 Text(
                   "${overview.tools}",
-                  style: const TextStyle(
+                  style: TextStyle(
                       // fontWeight: FontWeight.bold,
                       fontSize: 15),
                 ),

@@ -1,4 +1,5 @@
 import 'package:client/LoginScreen.dart';
+import 'package:client/pages/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'provider/auth_provider.dart';
@@ -105,9 +106,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                               emailController.text,
                               passwordController.text,
                             );
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Registration successful!')),
-                        );
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(content: Text('Registration successful!')),
+                        // );
+                        ShowSnackBarE.showSnackBar(
+                            context, 'Registration successful!');
                         // Navigator.pushReplacement(
                         //   context,
                         //   MaterialPageRoute(
@@ -116,9 +119,11 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                         context.go('/login');
                       } catch (e) {
                         print('Registration error: $e');
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('Registration failed: $e')),
-                        );
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(content: Text('Registration failed: $e')),
+                        // );
+                        ShowSnackBarE.showSnackBar(
+                            context, 'Registration failed: $e');
                       }
                     },
                     style: ElevatedButton.styleFrom(

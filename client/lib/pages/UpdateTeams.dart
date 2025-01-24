@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/team_provider.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class UpdateTeams extends ConsumerStatefulWidget {
   UpdateTeams({Key? key}) : super(key: key);
@@ -76,43 +78,45 @@ class _UpdateTeamsState extends ConsumerState<UpdateTeams> {
               ),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             ElevatedButton(
               onPressed: _pickImage,
               child: const Text('Select Image'),
             ),
             if (_image != null) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               kIsWeb
                   ? Image.memory(
                       _imageBytes!,
-                      width: 100,
-                      height: 100,
+                      width: 100.w,
+                      height: 100.h,
                       fit: BoxFit.cover,
                     )
                   : Image.file(
                       File(_image!.path),
-                      width: 100,
-                      height: 100,
+                      width: 100.w,
+                      height: 100.h,
                       fit: BoxFit.cover,
                     ),
             ],
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
                 // if (_validateForm()) {
-                ref.read(teamListProvider.notifier).updateTeams(
-                      teamNo,
-                      floorNo: _floorController.text.isNotEmpty
-                          ? _floorController.text
-                          : null,
-                      imageBytes: _imageBytes,
-                    );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Team created successfully!')),
-                );
-                // }
+                try {
+                  await ref.read(teamListProvider.notifier).updateTeams(
+                        eventId!,
+                        teamNo,
+                        floorNo: _floorController.text.isNotEmpty
+                            ? _floorController.text
+                            : null,
+                        imageBytes: _imageBytes,
+                      );
+                  ShowSnackBarE.showSnackBar(
+                      context, 'Team created successfully!');
+                } catch (e) {
+                  ShowSnackBarE.showSnackBar(context, 'Error :$e');
+                }
               },
               child: const Text('Submit'),
             ),

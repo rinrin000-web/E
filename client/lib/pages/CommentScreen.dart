@@ -1,9 +1,12 @@
+import 'package:client/main.dart';
+import 'package:client/pages/constants.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/comment_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:client/provider/team_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CommentScreen extends ConsumerWidget {
   final String? teamNo;
@@ -18,8 +21,8 @@ class CommentScreen extends ConsumerWidget {
 
     return SingleChildScrollView(
       child: SizedBox(
-        height: 500,
-        width: MediaQuery.of(context).size.width,
+        height: 500.h,
+        width: 1.sw,
         child: FutureBuilder<List<Comment>>(
           future: ref
               .read(commentProvider.notifier)
@@ -59,30 +62,10 @@ class CommentScreen extends ConsumerWidget {
                     final designRating = int.tryParse(designController.text);
                     final techRating = int.tryParse(techController.text);
 
-                    // if (comment.rank == null ||
-                    //     comment.present == null ||
-                    //     comment.plan == null ||
-                    //     comment.design == null ||
-                    //     comment.tech == null ||
-                    //     comment.comment == null ||
-                    //     comment.comment!.isEmpty) {
-                    //   ScaffoldMessenger.of(context).showSnackBar(
-                    //     const SnackBar(
-                    //       content: Text(
-                    //           'すべてのフィールドに入力してください！'), // Thông báo lỗi "Hãy điền tất cả các trường"
-                    //       duration: Duration(seconds: 2),
-                    //     ),
-                    //   );
-                    //   return;
-                    // }
                     if ([presentRating, planRating, designRating, techRating]
                         .any((rating) => rating != null && rating > 5)) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('評価は1から5の範囲内でなければなりません！'),
-                          duration: Duration(seconds: 2),
-                        ),
-                      );
+                      ShowSnackBarE.showSnackBar(
+                          context, '評価は1から5の範囲内でなければなりません！');
                       return;
                     }
 
@@ -113,38 +96,13 @@ class CommentScreen extends ConsumerWidget {
                           .read(teamListProvider.notifier)
                           .getRank(comment.team_no, eventId);
                     }
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            Image.asset(
-                              'images/echan.png',
-                              width: 50,
-                              height: 50,
-                            ),
-                            const SizedBox(width: 8),
-                            const Text(
-                              '保存しました!',
-                              style: TextStyle(
-                                color: Colors.black87,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: const Color(0xffF2E5BF),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        margin: const EdgeInsets.all(10),
-                        duration: const Duration(seconds: 2),
-                      ),
-                    );
+
+                    ShowSnackBarE.showSnackBar(context, TextE.save_text);
                   } catch (e) {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text('Error: ${e.toString()}')));
+                    // ScaffoldMessenger.of(context).showSnackBar(
+                    //     SnackBar(content: Text('Error: ${e.toString()}')));
+                    ShowSnackBarE.showSnackBar(
+                        context, 'Error: ${e.toString()}');
                   }
                 }
 
@@ -167,16 +125,14 @@ class CommentScreen extends ConsumerWidget {
                               itemSize: 20,
                               unratedColor:
                                   const Color.fromARGB(255, 11, 200, 210),
-                              itemBuilder: (context, _) => const Icon(
-                                  Icons.star,
-                                  size: 8,
-                                  color: Color(0xffFFCC66)),
+                              itemBuilder: (context, _) => Icon(Icons.star,
+                                  size: 8.w, color: Color(0xffFFCC66)),
                               onRatingUpdate: (rating) {
                                 rankController.text = rating.toInt().toString();
                               },
                             ),
-                            const SizedBox(
-                              width: 10,
+                            SizedBox(
+                              width: 10.w,
                             ),
                             IconButton(
                                 onPressed: () {
@@ -187,7 +143,7 @@ class CommentScreen extends ConsumerWidget {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                       ClipRRect(
                         child: Container(
                           decoration: BoxDecoration(
@@ -280,7 +236,7 @@ class CommentScreen extends ConsumerWidget {
                               ]),
                         ),
                       ),
-                      const SizedBox(height: 10),
+                      SizedBox(height: 10.h),
                       ClipRRect(
                         child: Container(
                           decoration: BoxDecoration(

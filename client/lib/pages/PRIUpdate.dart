@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:client/pages/constants.dart';
 import 'package:client/provider/memberImages_provider.dart';
 import 'package:client/provider/team_provider.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
 import 'dart:typed_data';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class PRIUpdate extends ConsumerStatefulWidget {
   const PRIUpdate({Key? key}) : super(key: key);
@@ -148,14 +150,14 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
                             ? Image.memory(
                                 _newImageBytesList[
                                     index - memberImagesList.length],
-                                width: double.infinity,
-                                height: 250,
+                                width: 1.sw,
+                                height: 250.h,
                                 fit: BoxFit.contain,
                               )
                             : Image.network(
                                 imageUrl ?? '',
-                                width: double.infinity,
-                                height: 250,
+                                width: 1.sw,
+                                height: 250.h,
                                 fit: BoxFit.contain,
                               ),
                       ),
@@ -166,15 +168,16 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
             ),
             ElevatedButton(
               onPressed: () {
-                if (_newImageBytesList.isNotEmpty) {
-                  ref.read(memberImagesProvider.notifier).updateImages(
-                        teamNo,
-                        _newImageBytesList,
-                      );
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content: Text('Images uploaded successfully!')),
-                  );
+                try {
+                  if (_newImageBytesList.isNotEmpty) {
+                    ref.read(memberImagesProvider.notifier).updateImages(
+                          teamNo,
+                          _newImageBytesList,
+                        );
+                    ShowSnackBarE.showSnackBar(context, '更新しました');
+                  }
+                } catch (e) {
+                  ShowSnackBarE.showSnackBar(context, 'Error: $e');
                 }
               },
               child: const Text('Submit'),

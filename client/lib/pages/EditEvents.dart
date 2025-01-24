@@ -6,6 +6,7 @@ import 'dart:io';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:go_router/go_router.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EditEvents extends ConsumerStatefulWidget {
   EditEvents({Key? key}) : super(key: key);
@@ -76,7 +77,7 @@ class _EditEventsState extends ConsumerState<EditEvents> {
               ),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 10),
+            SizedBox(height: 10.h),
             TextFormField(
               controller: _eventDateController,
               decoration: InputDecoration(
@@ -87,28 +88,28 @@ class _EditEventsState extends ConsumerState<EditEvents> {
               ),
               keyboardType: TextInputType.number,
             ),
-            const SizedBox(height: 16),
+            SizedBox(height: 16.h),
             ElevatedButton(
               onPressed: _pickImage,
               child: const Text('Select Image'),
             ),
             if (_image != null) ...[
-              const SizedBox(height: 16),
+              SizedBox(height: 16.h),
               kIsWeb
                   ? Image.memory(
                       _imageBytes!,
-                      width: 100,
-                      height: 100,
+                      width: 100.w,
+                      height: 100.h,
                       fit: BoxFit.cover,
                     )
                   : Image.file(
                       File(_image!.path),
-                      width: 100,
-                      height: 100,
+                      width: 100.w,
+                      height: 100.h,
                       fit: BoxFit.cover,
                     ),
             ],
-            const SizedBox(height: 24),
+            SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () {
                 ref.read(eventProvider.notifier).updateEvents(

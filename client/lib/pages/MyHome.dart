@@ -12,6 +12,7 @@ import 'package:client/pages/search_bar.dart';
 import 'package:client/provider/search_provider.dart';
 import 'package:client/provider/emailVisibility_provider.dart';
 import 'package:client/pages/constants.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Myhome extends ConsumerWidget {
   final StatefulNavigationShell navigationShell;
@@ -84,8 +85,8 @@ class Myhome extends ConsumerWidget {
     );
 
     final appbar = Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
-      width: double.infinity,
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 5.h),
+      width: 1.sw,
       color: ColorE.headerColorE,
       child: Stack(
         alignment: Alignment.center,
@@ -97,7 +98,7 @@ class Myhome extends ConsumerWidget {
           Center(
             child: Text(
               currentTitle,
-              style: const TextStyle(
+              style: TextStyle(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
                   // color: ColorE.backgroundColorE
@@ -114,22 +115,21 @@ class Myhome extends ConsumerWidget {
         children: [
           DrawerHeader(
               child: Column(children: [
-            const Icon(
+            Icon(
               Icons.person,
               size: 50,
             ),
-            const SizedBox(
-              height: 10,
+            SizedBox(
+              height: 10.h,
             ),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   isPublic ? '$user' : 'Euser',
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 IconButton(
                   icon: Icon(
                     isPublic ? Icons.visibility : Icons.visibility_off,
@@ -146,11 +146,11 @@ class Myhome extends ConsumerWidget {
             )
           ])),
           ListTile(
-            title: const Row(
+            title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(Icons.settings),
-                SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text('ユーザー編集'),
               ],
             ),
@@ -159,11 +159,11 @@ class Myhome extends ConsumerWidget {
             },
           ),
           ListTile(
-            title: const Row(
+            title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(Icons.arrow_back),
-                SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text('E展画面移動'),
               ],
             ),
@@ -187,11 +187,11 @@ class Myhome extends ConsumerWidget {
           // ),
           ListTile(
             title: user == 'admin@gmail.com'
-                ? const Row(
+                ? Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Icon(Icons.settings),
-                      SizedBox(width: 8),
+                      SizedBox(width: 8.w),
                       Text('フロアガイド編集'),
                     ],
                   )
@@ -204,11 +204,11 @@ class Myhome extends ConsumerWidget {
           ),
 
           ListTile(
-            title: const Row(
+            title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Icon(Icons.logout),
-                SizedBox(width: 8),
+                SizedBox(width: 8.w),
                 Text('ログアウト'),
               ],
             ),
@@ -236,7 +236,7 @@ class Myhome extends ConsumerWidget {
         ),
         actions: [
           IconButton(
-            icon: const Icon(
+            icon: Icon(
               Icons.list,
               color: ColorE.backgroundColorE,
               size: 35,

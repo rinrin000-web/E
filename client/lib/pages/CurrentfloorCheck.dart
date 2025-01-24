@@ -3,6 +3,7 @@ import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/floor_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CurrentfloorCheck extends ConsumerStatefulWidget {
   final String? user;
@@ -46,8 +47,8 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
     }
     return SizedBox(
       // color: Color,
-      height: 50,
-      width: MediaQuery.of(context).size.width,
+      height: 50.h,
+      width: 1.sw,
       child: ListView.builder(
         scrollDirection: Axis.horizontal,
         itemCount: floor.length,
@@ -55,11 +56,11 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
           return GestureDetector(
             onTap: () => onFloorTap(floor[i].floor_no),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 3.5), // Thêm padding để tạo khoảng cách
+              padding: EdgeInsets.symmetric(
+                  horizontal: 3.5.w), // Thêm padding để tạo khoảng cách
               child: Container(
-                width: 40,
-                height: 40,
+                width: 40.w,
+                height: 40.h,
                 decoration: BoxDecoration(
                   color: selectedFloor == floor[i].floor_no
                       ? Color(0xffFD8B51)
@@ -70,9 +71,9 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
                 child: Text(
                   '${floor[i].floor_no}',
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                      fontSize: 12.sp,
                       color: Colors.white),
                 ),
               ),

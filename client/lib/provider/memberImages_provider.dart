@@ -64,7 +64,7 @@ class MemberImagesNotifier extends StateNotifier<List<MemberImages>> {
 
         var response = await request.send();
 
-        if (response.statusCode == 201) {
+        if (response.statusCode == 200) {
           var responseData = await response.stream.bytesToString();
           var data = json.decode(responseData);
           print(data);

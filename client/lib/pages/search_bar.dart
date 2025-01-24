@@ -1,8 +1,10 @@
+import 'package:client/pages/constants.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:client/provider/search_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/team_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Searchbar extends ConsumerStatefulWidget {
   final int? eventId;
@@ -48,19 +50,19 @@ class _SearchbarState extends ConsumerState<Searchbar> {
     return
         // Center(
         Container(
-      height: 46,
-      width: MediaQuery.of(context).size.width,
+      height: 46.h,
+      width: 1.sw,
       alignment: Alignment.center,
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      padding: EdgeInsets.symmetric(horizontal: 8.w),
       decoration: BoxDecoration(
         color: const Color(0xff068288),
-        borderRadius: BorderRadius.circular(8.0),
+        borderRadius: BorderRadius.circular(8.r),
         border: Border.all(color: const Color(0xff068288)),
       ),
       child: TextField(
         controller: _controller,
-        style: const TextStyle(
-          fontSize: 18.0,
+        style: TextStyle(
+          fontSize: 18,
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
@@ -88,15 +90,19 @@ class _SearchbarState extends ConsumerState<Searchbar> {
             },
           ),
           contentPadding:
-              const EdgeInsets.symmetric(vertical: 10.0, horizontal: 20.0),
+              EdgeInsets.symmetric(vertical: 10.h, horizontal: 20.w),
           border: InputBorder.none,
         ),
         onSubmitted: (query) {
           // Tìm kiếm khi nhấn Enter
-          ref.read(searchProvider.notifier).updateQuery(query);
-          ref
-              .read(teamListProvider.notifier)
-              .searchByTeamNo(query, widget.eventId);
+          try {
+            ref.read(searchProvider.notifier).updateQuery(query);
+            ref
+                .read(teamListProvider.notifier)
+                .searchByTeamNo(query, widget.eventId);
+          } catch (e) {
+            ShowSnackBarE.showSnackBar(context, 'Error: $e');
+          }
         },
       ),
       // ),

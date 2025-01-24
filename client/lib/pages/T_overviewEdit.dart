@@ -1,3 +1,4 @@
+import 'package:client/pages/constants.dart';
 import 'package:client/provider/overview_provider.dart';
 import 'package:client/provider/team_provider.dart';
 import 'package:flutter/material.dart';
@@ -74,7 +75,13 @@ class TOverviewEdit extends ConsumerWidget {
             buildTextField('Tools', _tools),
             const SizedBox(height: 10),
             ElevatedButton.icon(
-              onPressed: saveOverView,
+              onPressed: () {
+                try {
+                  saveOverView();
+                } catch (e) {
+                  ShowSnackBarE.showSnackBar(context, '完成しました');
+                }
+              },
               icon: const Icon(Icons.save),
               label: const Text('Save'),
             ),

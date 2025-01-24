@@ -2,6 +2,7 @@ import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/floor_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class FloorGuideEdit extends ConsumerWidget {
   FloorGuideEdit({Key? key}) : super(key: key);
@@ -55,7 +56,7 @@ class FloorGuideEdit extends ConsumerWidget {
           children: [
             buildTextField('floor_no', _floor_no),
             buildTextField('contens', _contents),
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
@@ -65,8 +66,8 @@ class FloorGuideEdit extends ConsumerWidget {
                   icon: const Icon(Icons.save),
                   label: const Text('Save'),
                 ),
-                const SizedBox(
-                  width: 10,
+                SizedBox(
+                  width: 10.w,
                 ),
                 ElevatedButton.icon(
                   onPressed: () {

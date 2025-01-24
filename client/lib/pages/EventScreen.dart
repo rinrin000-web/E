@@ -7,6 +7,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class EventScreen extends ConsumerStatefulWidget {
   const EventScreen({super.key});
@@ -36,9 +37,9 @@ class _EventScreenState extends ConsumerState<EventScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(event_images.length, (index) {
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          width: 8,
-          height: 8,
+          margin: EdgeInsets.symmetric(horizontal: 5.w),
+          width: 8.w,
+          height: 8.h,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color:
@@ -50,7 +51,7 @@ class _EventScreenState extends ConsumerState<EventScreen> {
 
     final carousel = CarouselSlider.builder(
       options: CarouselOptions(
-        height: 500,
+        height: 500.h,
         viewportFraction: 0.8,
         onPageChanged: (index, reason) {
           setState(() {
@@ -76,11 +77,11 @@ class _EventScreenState extends ConsumerState<EventScreen> {
             context.push('/myhome/home');
           },
           child: Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            width: 1.sw,
+            margin: EdgeInsets.symmetric(horizontal: 5.w),
             decoration: const BoxDecoration(color: Colors.transparent),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8.r),
               child: Image.network(
                 event_images[index].images,
                 width: double.infinity,
@@ -97,15 +98,15 @@ class _EventScreenState extends ConsumerState<EventScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
-        height: MediaQuery.of(context).size.height,
+        height: 1.sh,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             carousel,
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             circle_list,
-            const SizedBox(height: 20),
+            SizedBox(height: 20.h),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [

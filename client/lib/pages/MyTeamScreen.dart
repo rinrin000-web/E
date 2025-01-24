@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/team_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MyTeamScreen extends ConsumerStatefulWidget {
   const MyTeamScreen({super.key});
@@ -38,9 +39,9 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
         borderRadius: BorderRadius.circular(8.0),
         child: Image.network(
           selectedTeam.teamfileimages,
-          fit: BoxFit.fill,
-          height: 300,
-          width: double.infinity,
+          fit: BoxFit.contain,
+          height: 300.h,
+          width: 1.sw,
         ));
     final icon_rank = GestureDetector(
         onTap: () {
@@ -83,11 +84,11 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
           child: Column(
             children: [
               teamfileimages,
-              const SizedBox(
+              SizedBox(
                 height: 10,
               ),
               row,
-              const SizedBox(
+              SizedBox(
                 height: 10,
               ),
               MemberScreen(selectedTeamNo: selectedTeamNo),
@@ -101,7 +102,7 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
                             selectedTab = 'overview'; // Chọn tab overview
                           });
                         },
-                        child: const Text(
+                        child: Text(
                           '概要',
                           style: TextStyle(
                               color: Color(0xff068288),
@@ -110,16 +111,16 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
                         ),
                       ),
                       Container(
-                        height: 2,
-                        width: 40,
+                        height: 2.h,
+                        width: 40.w,
                         color: selectedTab == 'overview'
                             ? const Color(0xff068288)
                             : Colors.transparent,
                       )
                     ],
                   ),
-                  const SizedBox(
-                    width: 5,
+                  SizedBox(
+                    width: 5.w,
                   ),
                   Column(
                     children: [
@@ -129,7 +130,7 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
                             selectedTab = 'comment'; // Chọn tab comment
                           });
                         },
-                        child: const Text(
+                        child: Text(
                           '評価',
                           style: TextStyle(
                               color: Color(0xff068288),
@@ -138,8 +139,8 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
                         ),
                       ),
                       Container(
-                        height: 2,
-                        width: 40,
+                        height: 2.h,
+                        width: 40.w,
                         color: selectedTab == 'comment'
                             ? const Color(0xff068288)
                             : Colors.transparent,

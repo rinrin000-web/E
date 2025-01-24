@@ -4,7 +4,7 @@ import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/team_provider.dart';
-// import 'package:client/provider/auth_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class WebScreen extends ConsumerStatefulWidget {
   const WebScreen({super.key});
@@ -47,7 +47,7 @@ class _WebScreenState extends ConsumerState<WebScreen> {
 
     final echan = Image.asset(
       'images/echan.png',
-      height: 80,
+      height: 80.h,
       fit: BoxFit.contain,
     );
     return Scaffold(
@@ -78,8 +78,8 @@ class _WebScreenState extends ConsumerState<WebScreen> {
             //   ],
             // ),
             Searchbar(eventId: eventId),
-            const SizedBox(
-              height: 10,
+            SizedBox(
+              height: 10.h,
             ),
             Text(
               '( ${filteredTeams.length} ) ',

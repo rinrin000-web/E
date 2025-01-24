@@ -74,7 +74,7 @@ Route::prefix('teams')->group(function () {
     Route::get('teamfileimages/{filename}', [TeamController::class, 'getImage']);
     // Route::post('update-image/{team_no}', [TeamController::class, 'updateTeamImage']);
     Route::post('/{eventId}', [TeamController::class, 'store']);
-    Route::post('update-image/{team_no}', [TeamController::class, 'update']);
+    Route::post('update-image/{event_id}/{team_no}', [TeamController::class, 'update']);
     Route::get('getRank/{team_no}/{event_id}', [TeamController::class, 'getRank']);
     Route::delete('/{team_no}', [TeamController::class, 'destroy']);
 });

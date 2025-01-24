@@ -2,6 +2,7 @@ import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/favorite_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class TeamFavoriteWidget extends ConsumerStatefulWidget {
   final String? userEmail;
@@ -40,7 +41,7 @@ class _TeamFavoriteSate extends ConsumerState<TeamFavoriteWidget> {
       icon: Icon(
         isFavorite ? Icons.favorite : Icons.favorite_border,
         color: isFavorite ? Colors.red : Colors.grey,
-        size: 30,
+        // size: 30.w,
       ),
       onPressed: () async {
         try {

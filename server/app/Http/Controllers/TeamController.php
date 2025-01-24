@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use App\Models\Team;
 use App\Models\Event;
 use App\Models\Eventsmange;
+use App\Models\Floor;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
@@ -54,7 +55,13 @@ public function store(Request $request, $eventId)
         'floor_no' => 'required|exists:floors,floor_no', // Ensure floor_no exists in floors table
         // 'rank' => 'nullable|numeric', // Optional rank field
     ]);
+    $validFloor = Floor::where('event_id', $eventId)
+                   ->where('floor_no', $request->floor_no)
+                   ->exists();
 
+if ($request->floor_no && !$validFloor) {
+    return response()->json(['message' => 'floor_no does not exist for this event'], 404);
+}
     $imagePath = null;
     if ($request->hasFile('teamfileimages')) {
         // If the image file is provided, store it
@@ -121,12 +128,19 @@ public function store(Request $request, $eventId)
 //     }
 // }
 
-public function update(Request $request, $team_no)
+public function update(Request $request,$event_id, $team_no)
 {
     $request->validate([
         'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',
         'floor_no' => 'nullable|exists:floors,floor_no',
     ]);
+    $validFloor = Floor::where('event_id', $event_id)
+                   ->where('floor_no', $request->floor_no)
+                   ->exists();
+
+if ($request->floor_no && !$validFloor) {
+    return response()->json(['message' => 'floor_no does not exist for this event'], 404);
+}
 
     $team = Team::where('team_no', $team_no)->first();
 
@@ -164,23 +178,21 @@ public function update(Request $request, $team_no)
 
 
 
-    public function destroy($team_no)
-    {
-        $teams = Team::where('team_no', $team_no)->first();
+public function destroy($team_no)
+{
+    // Tìm team theo team_no
+    $team = Team::where('team_no', $team_no)->first();
 
-        if (!$teams) {
-            return response()->json(['message' => 'Event not found'], 404);
-        }
-
-        // Xóa ảnh nếu có
-        if ($teams->images) {
-            Storage::disk('public')->delete($teams->images);
-        }
-
-        $teams->delete();
-
-        return response()->json(['message' => 'Event deleted successfully', 'data' => $teams], 200);
+    // Kiểm tra nếu team tồn tại
+    if ($team) {
+        $team->delete();
+        return response()->json(['message' => 'Team deleted successfully', 'data' => $team], 200);
+    } else {
+        return response()->json(['message' => 'Team not found'], 404);
     }
+}
+
+
 
     public function index($team_no = null)
     {

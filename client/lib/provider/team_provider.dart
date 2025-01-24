@@ -124,11 +124,13 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     }
   }
 
-  Future<void> updateTeams(String? teamNo,
+  Future<void> updateTeams(int eventId, String? teamNo,
       {String? floorNo, Uint8List? imageBytes}) async {
     try {
-      var request = http.MultipartRequest('POST',
-          Uri.parse('${BaseUrlE.baseUrl}/api/teams/update-image/$teamNo'));
+      var request = http.MultipartRequest(
+          'POST',
+          Uri.parse(
+              '${BaseUrlE.baseUrl}/api/teams/update-image/$eventId/$teamNo'));
 
       if (floorNo != null && floorNo.isNotEmpty) {
         request.fields['floor_no'] = floorNo;

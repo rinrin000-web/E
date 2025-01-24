@@ -118,9 +118,10 @@ class LoginScreen extends ConsumerWidget {
                         //
                         context.go('/event');
                       } catch (e) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text('ログイン失敗: $e')),
-                        );
+                        // ScaffoldMessenger.of(context).showSnackBar(
+                        //   SnackBar(content: Text('ログイン失敗: $e')),
+                        // );
+                        ShowSnackBarE.showSnackBar(context, 'ログイン失敗: $e');
                       }
                     },
                     style: ElevatedButton.styleFrom(

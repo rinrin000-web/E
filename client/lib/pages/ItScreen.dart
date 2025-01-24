@@ -4,7 +4,7 @@ import 'package:client/provider/event_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/team_provider.dart';
-// import 'package:client/provider/auth_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Itscreen extends ConsumerStatefulWidget {
   const Itscreen({super.key});
@@ -46,7 +46,7 @@ class _ItscreenState extends ConsumerState<Itscreen> {
 
     final echan = Image.asset(
       'images/echan.png',
-      height: 80,
+      height: 80.h,
       fit: BoxFit.contain,
     );
     return Scaffold(
@@ -60,8 +60,8 @@ class _ItscreenState extends ConsumerState<Itscreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Searchbar(eventId: eventId),
-            const SizedBox(
-              height: 10,
+            SizedBox(
+              height: 10.h,
             ),
             Text(
               '( ${filteredTeams.length} ) ',

@@ -10,6 +10,7 @@ import 'package:client/pages/TeamList.dart';
 import 'package:client/provider/team_provider.dart';
 import 'package:client/pages/CurrentfloorCheck.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class Homescreen extends ConsumerStatefulWidget {
   const Homescreen({super.key});
@@ -48,7 +49,7 @@ class _HomescreenState extends ConsumerState<Homescreen> {
     );
     final echan = Image.asset(
       'assets/images/pet.png',
-      height: 80,
+      height: 80.h,
       fit: BoxFit.contain,
     );
     return Scaffold(
@@ -66,7 +67,7 @@ class _HomescreenState extends ConsumerState<Homescreen> {
             ),
             Expanded(
               child: Container(
-                padding: const EdgeInsets.only(top: 50),
+                padding: EdgeInsets.only(top: 50.h),
                 child: list,
               ),
             ),
@@ -77,12 +78,12 @@ class _HomescreenState extends ConsumerState<Homescreen> {
                   // right: 10,
                   child: Container(
                       color: ColorE.backgroundColorE,
-                      padding: const EdgeInsets.only(top: 5.0),
+                      padding: EdgeInsets.only(top: 5.h),
                       child: Row(
                         children: [
                           echan,
-                          const SizedBox(
-                            width: 10,
+                          SizedBox(
+                            width: 10.w,
                           ),
                           CurrentfloorCheck(
                             user: user,
@@ -100,7 +101,7 @@ class _HomescreenState extends ConsumerState<Homescreen> {
                   onPressed: () {
                     context.go('/myhome/home/newTeams');
                   },
-                  icon: const Icon(
+                  icon: Icon(
                     Icons.add,
                     size: 30,
                   )))

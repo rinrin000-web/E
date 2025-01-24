@@ -3,6 +3,7 @@ import 'package:client/provider/memberImages_provider.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/pages/FullScreenImage.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class MemberScreen extends ConsumerStatefulWidget {
   String? selectedTeamNo;
@@ -35,9 +36,9 @@ class _MemberScreenState extends ConsumerState<MemberScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(mem_images.length, (index) {
         return Container(
-          margin: const EdgeInsets.symmetric(horizontal: 5),
-          width: 8,
-          height: 8,
+          margin: EdgeInsets.symmetric(horizontal: 5.w),
+          width: 8.w,
+          height: 8.h,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
             color:
@@ -49,7 +50,7 @@ class _MemberScreenState extends ConsumerState<MemberScreen> {
 
     final carousel = CarouselSlider.builder(
       options: CarouselOptions(
-        height: 150.0,
+        height: 150.h,
         viewportFraction: 0.6,
         onPageChanged: (index, reason) {
           setState(() {
@@ -69,14 +70,14 @@ class _MemberScreenState extends ConsumerState<MemberScreen> {
             );
           },
           child: Container(
-            width: MediaQuery.of(context).size.width,
-            margin: const EdgeInsets.symmetric(horizontal: 5.0),
+            width: 1.sw,
+            margin: EdgeInsets.symmetric(horizontal: 5.w),
             decoration: const BoxDecoration(color: Colors.amber),
             child: ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
+              borderRadius: BorderRadius.circular(8.r),
               child: Image.network(
                 mem_images[index].memberfileimages,
-                width: 392,
+                // width: 250.w,
                 fit: BoxFit.cover,
                 errorBuilder: (context, error, stackTrace) {
                   return const Icon(Icons.error);
@@ -92,7 +93,7 @@ class _MemberScreenState extends ConsumerState<MemberScreen> {
       child: Column(
         children: [
           carousel,
-          const SizedBox(height: 10),
+          SizedBox(height: 10.h),
           circle_list,
         ],
       ),

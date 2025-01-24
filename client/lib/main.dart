@@ -19,6 +19,7 @@ import 'package:client/pages/createTeams.dart';
 import 'package:client/pages/main_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:responsive_framework/responsive_framework.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:go_router/go_router.dart';
@@ -175,37 +176,43 @@ class MyApp extends ConsumerWidget {
         ),
       ],
     );
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      routerConfig: _router,
-      // initialRoute: '/wellcome',
-      // routes: {
-      //   '/wellcome': (context) => WellcomeScreen(),
-      //   '/login': (context) => LoginScreen(),
-      //   '/signup': (context) => RegisterScreen(),
-      //   '/event': (context) => EventScreen(),
-      // },
-      builder: (context, child) => ResponsiveBreakpoints.builder(
-        child: Container(
-          decoration: const BoxDecoration(
-            image: DecorationImage(
-              image: ColorE.backgroundImage, // Đặt ảnh nền
-              fit: BoxFit.fill, // Ảnh nền phủ toàn bộ màn hình
+    return ScreenUtilInit(
+        designSize: const Size(430, 932),
+        minTextAdapt: true, // Đảm bảo text không bị cắt
+        splitScreenMode: true, // Hỗ trợ split screen
+        builder: (context, child) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            routerConfig: _router,
+            // initialRoute: '/wellcome',
+            // routes: {
+            //   '/wellcome': (context) => WellcomeScreen(),
+            //   '/login': (context) => LoginScreen(),
+            //   '/signup': (context) => RegisterScreen(),
+            //   '/event': (context) => EventScreen(),
+            // },
+            builder: (context, child) => ResponsiveBreakpoints.builder(
+              child: Container(
+                decoration: const BoxDecoration(
+                  image: DecorationImage(
+                    image: ColorE.backgroundImage, // Đặt ảnh nền
+                    fit: BoxFit.fill, // Ảnh nền phủ toàn bộ màn hình
+                  ),
+                ),
+                child: child!, // Hiển thị các widget con bên trong
+              ),
+              breakpoints: [
+                // ← 追加
+                const Breakpoint(start: 0, end: 450, name: MOBILE),
+                const Breakpoint(start: 451, end: 800, name: TABLET),
+                const Breakpoint(start: 801, end: 1920, name: DESKTOP),
+                const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
+              ],
             ),
-          ),
-          child: child!, // Hiển thị các widget con bên trong
-        ),
-        breakpoints: [
-          // ← 追加
-          const Breakpoint(start: 0, end: 450, name: MOBILE),
-          const Breakpoint(start: 451, end: 800, name: TABLET),
-          const Breakpoint(start: 801, end: 1920, name: DESKTOP),
-          const Breakpoint(start: 1921, end: double.infinity, name: '4K'),
-        ],
-      ),
-      // // initialRoute: "/",
-      // home: WellcomeScreen(),
-    );
+            // // initialRoute: "/",
+            // home: WellcomeScreen(),
+          );
+        });
   }
 }
 

@@ -14,56 +14,33 @@ import 'package:client/provider/emailVisibility_provider.dart';
 import 'package:client/pages/constants.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class Myhome extends ConsumerWidget {
+class Myhome extends ConsumerStatefulWidget {
   final StatefulNavigationShell navigationShell;
   final GlobalKey<ScaffoldState> scaffoldKey = GlobalKey<ScaffoldState>();
 
   Myhome({Key? key, required this.navigationShell}) : super(key: key);
+  @override
+  MyhomeState createState() => MyhomeState();
+}
+
+class MyhomeState extends ConsumerState<Myhome> {
+  @override
+  void initState() {
+    super.initState();
+    ref.read(userLocationProvider.notifier).fetchUserLocation();
+  }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final selectedIndex = ref.watch(tabIndexProvider);
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
-    final user = ref.watch(authProvider).commentUser;
+    final currentUser =
+        ref.watch(authProvider).commentUser; // Lấy thông tin user hiện tại
+
+    final isAdmin = ref.watch(authProvider).isAdmin;
 
     final isPublic = ref.watch(emailVisibilityProvider);
-    // final String title_text = "ホーム";
-    // // void _onItemTapped(int index) {
-    // //   ref.read(tabIndexProvider.notifier).setTabIndex(index);
-    // //   if (index == 0) {
-    // //     navigationShell.goBranch(index, initialLocation: true);
-    // //   } else {
-    // //     navigationShell.goBranch(index);
-    // //   }
-    // // }
-    // void _onItemTapped(int index) {
-    //   ref.read(tabIndexProvider.notifier).setTabIndex(index); // Cập nhật tab
-    //   // Điều hướng đến trang tương ứng dựa trên index
-    //   switch (index) {
-    //     case 0:
-    //       context.go('/myhome/home');
-    //       title_text = 'ホーム';
-    //       break;
-    //     case 1:
-    //       context.go('/myhome/it');
-    //       title_text = 'IT';
-    //       break;
-    //     case 2:
-    //       context.go('/myhome/web');
-    //       title_text = 'WEB系';
-    //       break;
-    //     case 3:
-    //       context.go('/myhome/floor');
-    //       title_text = 'フロアガイド';
-    //       break;
-    //     case 4:
-    //       context.go('/myhome/favorite');
-    //       title_text = '気に入り';
-    //       break;
-    //     default:
-    //       break;
-    //   }
-    // }
+
     final titles = ["ホーム", "IT系", "WEB系", "フロアガイド", "気に入り"];
     final currentTitle = titles[selectedIndex];
 
@@ -82,6 +59,7 @@ class Myhome extends ConsumerWidget {
     final searchQuery = ref.watch(searchProvider);
     final logoImage = Image.asset(
       'assets/images/echanlogo.png',
+      width: 70.w,
     );
 
     final appbar = Container(
@@ -126,7 +104,7 @@ class Myhome extends ConsumerWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  isPublic ? '$user' : 'Euser',
+                  isPublic ? '$currentUser' : 'Euser',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
                 SizedBox(width: 8.w),
@@ -168,25 +146,14 @@ class Myhome extends ConsumerWidget {
               ],
             ),
             onTap: () {
-              ref.read(userLocationProvider.notifier).clearUserLocation(user);
+              ref
+                  .read(userLocationProvider.notifier)
+                  .clearUserLocation(currentUser);
               context.go('/event');
             },
           ),
-          // ListTile(
-          //   title: const Row(
-          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          //     children: [
-          //       Icon(Icons.settings),
-          //       SizedBox(width: 8),
-          //       Text('新規E展作成'),
-          //     ],
-          //   ),
-          //   onTap: () {
-          //     context.go('/myhome/home/newEvents');
-          //   },
-          // ),
           ListTile(
-            title: user == 'admin@gmail.com'
+            title: isAdmin!
                 ? Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -197,12 +164,28 @@ class Myhome extends ConsumerWidget {
                   )
                 : null, // Không hiển thị nếu không phải admin
             onTap: () {
-              if (user == 'admin@gmail.com') {
+              if (isAdmin) {
                 context.go('/myhome/home/floorEdit');
               }
             },
           ),
-
+          ListTile(
+            title: isAdmin
+                ? Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Icon(Icons.settings),
+                      SizedBox(width: 8.w),
+                      Text('メンバー管理'),
+                    ],
+                  )
+                : null, // Không hiển thị nếu không phải admin
+            onTap: () {
+              if (isAdmin) {
+                context.go('/myhome/home/member_manage');
+              }
+            },
+          ),
           ListTile(
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -213,9 +196,11 @@ class Myhome extends ConsumerWidget {
               ],
             ),
             onTap: () {
-              ref.read(userLocationProvider.notifier).clearUserLocation(user);
+              ref
+                  .read(userLocationProvider.notifier)
+                  .clearUserLocation(currentUser);
               ref.read(authProvider.notifier).logout();
-              if (user == 'admin@gmail.com') {
+              if (isAdmin) {
                 ref.read(floorProvider.notifier).resetFakeUserCount(eventId!);
               }
               context.go('/');
@@ -226,7 +211,7 @@ class Myhome extends ConsumerWidget {
     );
 
     return Scaffold(
-      key: scaffoldKey,
+      key: widget.scaffoldKey,
       backgroundColor: Colors.transparent,
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -242,13 +227,13 @@ class Myhome extends ConsumerWidget {
               size: 35,
             ),
             onPressed: () {
-              scaffoldKey.currentState!.openEndDrawer();
+              widget.scaffoldKey.currentState!.openEndDrawer();
             },
           ),
         ],
       ),
       endDrawer: enDrawer,
-      body: navigationShell,
+      body: widget.navigationShell,
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,
         onTap: _onItemTapped,

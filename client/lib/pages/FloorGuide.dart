@@ -1,6 +1,7 @@
 import 'package:client/provider/auth_provider.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/floor_provider.dart';
+import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -18,15 +19,18 @@ class _FloorguideState extends ConsumerState<Floorguide> {
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
     print('eventId: $eventId');
     ref.read(floorProvider.notifier).fetchFloorcount(eventId);
+    ref.read(userLocationProvider.notifier).fetchUserLocation();
   }
 
   @override
   Widget build(BuildContext context) {
     final floor = ref.watch(floorProvider);
     final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
-    final user = ref.watch(authProvider).commentUser;
-    final isAdmin = user == 'admin@gmail.com';
-
+    final currentUser =
+        ref.watch(authProvider).commentUser; // Lấy thông tin user hiện tại
+    final isAdmin = ref.watch(authProvider).isAdmin;
+    // print('Current user: $currentUser');
+    // print('Users: ${users.length}');
     final text1 = Text(
       '参加者',
       // style: TextStyle(fontSize: 16.sp),
@@ -80,7 +84,7 @@ class _FloorguideState extends ConsumerState<Floorguide> {
                 double initialSliderValue = currentFloor.userCount.toDouble();
 
                 // Nếu admin sửa thì giá trị của slider sẽ là fakeusercount
-                if (isAdmin) {
+                if (isAdmin!) {
                   initialSliderValue = currentFloor.fakeusercount.toDouble();
                 }
 

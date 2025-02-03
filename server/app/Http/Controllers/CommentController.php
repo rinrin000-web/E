@@ -41,15 +41,7 @@ class CommentController extends Controller
 
 
      //1件取得
-    //  public function show($comment_user){
-    //     $comments = Comment::where('comment_user', $comment_user)->get();
 
-    //     if ($comments->isEmpty()) {
-    //         return response()->json(['message' => 'No comments found for this user'], 404);
-    //     }
-
-    //     return response()->json($comments, 200);
-    //     }
         // 1件取得
     public function show($team_no,$comment_user)
     {
@@ -59,11 +51,11 @@ class CommentController extends Controller
                             ->get();
 
         if ($comments->isEmpty()) {
-            // Nếu không có bình luận, trả về thông báo cho người dùng
+
             return response()->json(['message' => 'You have not rated this team yet. Please submit your comment.'], 404);
         }
 
-        // Nếu có bình luận, trả về danh sách bình luận
+
         return response()->json($comments, 200);
     }
     public function getHistory(Request $request, $user)
@@ -121,7 +113,7 @@ class CommentController extends Controller
         if ($comments->isEmpty()) {
             return response()->json(['message' => 'No comments found for this user in this team'], 404);
         }
-        // Xóa tất cả bình luận của người dùng trong team
+
         foreach ($comments as $comment) {
         $comment->delete();
         }

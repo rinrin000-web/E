@@ -55,7 +55,11 @@ class _FullScreenImageState extends ConsumerState<FullScreenImage> {
             child: IconButton(
               icon: Icon(Icons.close, color: Colors.white),
               onPressed: () {
-                Navigator.of(context).pop();
+                SystemChrome.setPreferredOrientations([
+                  DeviceOrientation.portraitUp,
+                ]).then((_) {
+                  Navigator.of(context).pop(); // Đóng màn hình
+                });
               },
             ),
           ),

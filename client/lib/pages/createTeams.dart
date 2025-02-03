@@ -124,7 +124,7 @@ class _CreateTeamsState extends ConsumerState<CreateTeams> {
                           eventId,
                           _teamNoController.text,
                           _floorController.text,
-                          _imageBytes!,
+                          _imageBytes ?? File(_image!.path).readAsBytesSync(),
                         );
                     ref
                         .read(teamListProvider.notifier)

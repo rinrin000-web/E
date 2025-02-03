@@ -75,32 +75,6 @@ class CommentNotifier extends StateNotifier<List<Comment>> {
     }
   }
 
-  // Future<List<Comment>> getHistory(String? user) async {
-  //   final response = await http.get(Uri.parse('$baseUrl/getHistory/$user'));
-
-  //   if (response.statusCode == 200) {
-  //     List<dynamic> body = json.decode(response.body);
-  //     return body.map((json) => Comment.fromJson(json)).toList();
-  //   } else {
-  //     throw Exception('Failed to load teams commented by user');
-  //   }
-  // }
-  // Future<void> getHistory(String? user) async {
-  //   try {
-  //     final response = await http.get(Uri.parse('$baseUrl/getHistory/$user'));
-
-  //     if (response.statusCode == 200) {
-  //       List<dynamic> body = json.decode(response.body);
-  //       state = body.map((json) => Comment.fromJson(json)).toList();
-  //     } else {
-  //       throw Exception('Failed to load Comment');
-  //     }
-  //   } catch (e) {
-  //     print('Error occurred: $e');
-  //     throw Exception('Failed to load Comment');
-  //   }
-  // }
-
   Future<Comment> createComment(Comment comment) async {
     final response = await http.post(
       Uri.parse('$baseUrl/'),

@@ -1,7 +1,7 @@
 import 'package:client/pages/HomeScreen.dart';
 import 'package:client/pages/MyHome.dart';
-import 'package:client/pages/main_home.dart';
 import 'package:client/provider/event_provider.dart';
+import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:client/provider/auth_provider.dart';
@@ -28,14 +28,36 @@ class _EventScreenState extends ConsumerState<EventScreen> {
   @override
   Widget build(BuildContext context) {
     final event_images = ref.watch(eventProvider);
-    final user = ref.watch(authProvider).commentUser;
-
     if (event_images.isEmpty) {
       return Center(child: CircularProgressIndicator());
     }
+    final currentUser = ref.watch(authProvider).commentUser;
+    final isAdmin = ref.watch(authProvider).isAdmin;
+    final currentDate = DateTime.now();
+    print("Current Date: $currentDate");
+    print("event_date :${event_images[selectedIndex].event_date}");
+    final validEvents = isAdmin!
+        ? event_images
+        : event_images.where((event) {
+            try {
+              final eventDate = DateTime.parse(event.event_date);
+              print("Event Date for ${event.event_name}: $eventDate");
+
+              bool isValid = eventDate.isBefore(currentDate) ||
+                  eventDate.isAtSameMomentAs(currentDate);
+              print("Is valid: $isValid");
+              return isValid;
+            } catch (e) {
+              print("Error parsing date for event: ${event.event_date}");
+              return false;
+            }
+          }).toList();
+
+    print("Filtered Events: $validEvents");
+
     final circle_list = Row(
       mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(event_images.length, (index) {
+      children: List.generate(validEvents.length, (index) {
         return Container(
           margin: EdgeInsets.symmetric(horizontal: 5.w),
           width: 8.w,
@@ -55,25 +77,18 @@ class _EventScreenState extends ConsumerState<EventScreen> {
         viewportFraction: 0.8,
         onPageChanged: (index, reason) {
           setState(() {
-            selectedIndex = index; // Cập nhật selectedIndex khi thay đổi trang
+            selectedIndex = index;
           });
         },
       ),
-      itemCount: event_images.length,
+      itemCount: validEvents.length,
       itemBuilder: (BuildContext context, int index, int realIndex) {
         return GestureDetector(
           onTap: () async {
-            // Khi nhấn vào hình ảnh, điều hướng đến màn hình hiển thị hình ảnh toàn màn hình
-            // Navigator.of(context).push(
-            //   MaterialPageRoute(
-            //     builder: (context) => FullScreenImage(selectedIndex: index),
-            //   ),
-            // );
             await ref
                 .read(eventProvider.notifier)
-                .saveSelectedEventId(event_images[index].id);
+                .saveSelectedEventId(validEvents[index].id);
             await ref.read(eventProvider.notifier).fetchEvent();
-            print("Selected Event ID: ${event_images[index].id}");
             context.push('/myhome/home');
           },
           child: Container(
@@ -83,7 +98,7 @@ class _EventScreenState extends ConsumerState<EventScreen> {
             child: ClipRRect(
               borderRadius: BorderRadius.circular(8.r),
               child: Image.network(
-                event_images[index].images,
+                validEvents[index].images,
                 width: double.infinity,
                 fit: BoxFit.contain,
                 errorBuilder: (context, error, stackTrace) {
@@ -95,6 +110,7 @@ class _EventScreenState extends ConsumerState<EventScreen> {
         );
       },
     );
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -103,24 +119,31 @@ class _EventScreenState extends ConsumerState<EventScreen> {
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            carousel,
+            if (validEvents[selectedIndex].event_date.isNotEmpty) carousel,
             SizedBox(height: 20.h),
             circle_list,
             SizedBox(height: 20.h),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                if (user == 'admin@gmail.com')
+            Text(
+              validEvents[selectedIndex].event_date,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
+            ),
+            if (isAdmin!)
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
                   IconButton(
-                      icon: const Icon(
-                        Icons.edit,
-                        size: 30,
-                        // color: Colors.red,
-                      ),
-                      onPressed: () {
-                        context.go('/editEvents');
-                      }),
-                IconButton(
+                    icon: const Icon(
+                      Icons.edit,
+                      size: 30,
+                    ),
+                    onPressed: () {
+                      ref
+                          .read(eventProvider.notifier)
+                          .saveSelectedEventId(validEvents[selectedIndex].id);
+                      context.go('/editEvents');
+                    },
+                  ),
+                  IconButton(
                     icon: const Icon(
                       Icons.delete,
                       size: 30,
@@ -129,14 +152,15 @@ class _EventScreenState extends ConsumerState<EventScreen> {
                     onPressed: () {
                       ref
                           .read(eventProvider.notifier)
-                          .deleteEvent(event_images[selectedIndex].id);
-                    }),
-              ],
-            )
+                          .deleteEvent(validEvents[selectedIndex].id);
+                    },
+                  ),
+                ],
+              )
           ],
         ),
       ),
-      floatingActionButton: user == 'admin@gmail.com'
+      floatingActionButton: isAdmin
           ? FloatingActionButton(
               onPressed: () {
                 context.go('/newEvents');
@@ -144,30 +168,6 @@ class _EventScreenState extends ConsumerState<EventScreen> {
               child: const Icon(Icons.add),
             )
           : null,
-
-      // Container(
-      //   padding: EdgeInsets.all(15),
-      //   alignment: Alignment.center,
-      //   // child: SizedBox(
-      //   child: ElevatedButton(
-      //       onPressed: () {
-      //         // Navigator.pushReplacement(
-      //         //   context,
-      //         //   MaterialPageRoute(builder: (context) => MainHome()),
-      //         // );
-      //         context.push('/myhome/home');
-      //         // Navigator.push(
-      //         //   context,
-      //         //   MaterialPageRoute(builder: (context) => Myhome()),
-      //         // );
-      //       },
-      //       style: ElevatedButton.styleFrom(
-      //         padding: EdgeInsets.zero, // Xóa khoảng cách padding mặc định
-      //         minimumSize: Size(0, 0), // Không đặt kích thước tối thiểu
-      //       ),
-      //       child: images),
-      //   // )
-      // ),
     );
   }
 }

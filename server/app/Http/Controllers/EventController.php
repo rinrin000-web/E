@@ -11,9 +11,11 @@ class EventController extends Controller
 {
     // Lấy danh sách tất cả sự kiện
     public function index()
-    {
-        return response()->json(Event::all(), 200, [], JSON_PRETTY_PRINT);
-    }
+{
+    $events = Event::orderBy('event_date', 'desc')->get(); // Sắp xếp giảm dần theo event_date
+    return response()->json($events, 200, [], JSON_PRETTY_PRINT);
+}
+
 
     // Tạo mới một sự kiện
     public function store(Request $request)
@@ -79,6 +81,7 @@ class EventController extends Controller
         $dataToUpdate['event_date'] = $request->event_date;
     }
 
+    // Nếu có ảnh mới
     if ($request->hasFile('images')) {
         // Xóa ảnh cũ nếu có
         if ($event->images) {
@@ -96,49 +99,6 @@ class EventController extends Controller
 
     return response()->json($event);
 }
-
-    // public function update(Request $request,$id)
-    // {
-    //     $events = Event::find($id);
-    //     $events->update($request->all());
-    //     return response()->json($events);
-    // }
-
-
-    // Cập nhật ảnh theo event_name
-    // public function updateTeamImage(Request $request, $id)
-    // {
-    //     $request->validate([
-    //         'images' => 'nullable|image|mimes:jpg,jpeg,png|max:2048',  // Xác thực file ảnh
-    //     ]);
-
-    //     // Tìm sự kiện theo event_name
-    //     $event = Event::where('id', $id)->first();
-
-    //     if (!$event) {
-    //         return response()->json(['message' => 'Event not found'], 404);
-    //     }
-
-    //     // Xử lý upload ảnh (nếu có)
-    //     if ($request->hasFile('images')) {
-    //         $file = $request->file('images');
-    //         // $fileName = $eventName . '_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-    //         $imagePath = $file->store('eventimages');
-
-    //         // Xóa ảnh cũ nếu có
-    //         if ($event->images) {
-    //             Storage::disk('public')->delete($event->images);
-    //         }
-
-    //         $event->images = $imagePath;
-    //         $event->save();
-
-    //         return response()->json(['message' => 'Image updated successfully', 'event' => $event], 200);
-    //     } else {
-    //         return response()->json(['message' => 'No image uploaded'], 400);
-    //     }
-    // }
-
     // Lấy ảnh theo tên file
     public function getImage($filename)
     {

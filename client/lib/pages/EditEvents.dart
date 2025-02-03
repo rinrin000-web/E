@@ -19,11 +19,9 @@ class _EditEventsState extends ConsumerState<EditEvents> {
   final TextEditingController _eventNameController = TextEditingController();
   final TextEditingController _eventDateController = TextEditingController();
 
-  // String? _floorNoError;
-  // String? _imageError;
-
   XFile? _image;
   Uint8List? _imageBytes;
+  String? _imageError;
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
@@ -35,32 +33,48 @@ class _EditEventsState extends ConsumerState<EditEvents> {
         setState(() {
           _image = pickedFile;
           _imageBytes = imageBytes;
-          // _imageError = null;
+          _imageError = null;
         });
       } else {
         setState(() {
           _image = pickedFile;
-          // _imageError = null;
+          _imageError = null;
         });
       }
     }
   }
 
-  // bool _validateForm() {
-  //   bool isValid = true;
-  //   setState(() {
-  //     _floorNoError =
-  //         _floorController.text.isEmpty ? 'Please enter a floor number' : null;
-  //     _imageError = _image == null ? 'Please select an image' : null;
+  Future<void> _selectDate(BuildContext context) async {
+    DateTime initialDate = DateTime.now();
+    DateTime firstDate = DateTime(2000);
+    DateTime lastDate = DateTime(2101);
 
-  //     isValid = _floorNoError == null && _imageError == null;
-  //   });
-  //   return isValid;
-  // }
+    final pickedDate = await showDatePicker(
+      context: context,
+      initialDate: initialDate,
+      firstDate: firstDate,
+      lastDate: lastDate,
+    );
+
+    if (pickedDate != null && pickedDate != initialDate) {
+      setState(() {
+        _eventDateController.text =
+            "${pickedDate.toLocal()}".split(' ')[0]; // Format: yyyy-MM-dd
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    ref.read(eventProvider.notifier).fetchEvent();
+  }
 
   @override
   Widget build(BuildContext context) {
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
+    print("eventupdate :$eventId");
+
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
@@ -70,23 +84,25 @@ class _EditEventsState extends ConsumerState<EditEvents> {
             TextFormField(
               controller: _eventNameController,
               decoration: InputDecoration(
-                labelText: 'Ename',
-                hintText: 'E',
+                labelText: 'Event Name',
+                hintText: 'Event Name',
                 border: const UnderlineInputBorder(),
-                // errorText: _floorNoError, // Hiển thị lỗi
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.text,
             ),
             SizedBox(height: 10.h),
             TextFormField(
               controller: _eventDateController,
               decoration: InputDecoration(
-                labelText: 'date',
-                hintText: '2024/12/12',
+                labelText: 'Event Date',
+                hintText: 'YYYY-MM-DD',
                 border: const UnderlineInputBorder(),
-                // errorText: _floorNoError, // Hiển thị lỗi
               ),
-              keyboardType: TextInputType.number,
+              keyboardType: TextInputType.datetime,
+              onTap: () {
+                FocusScope.of(context).requestFocus(FocusNode());
+                _selectDate(context);
+              },
             ),
             SizedBox(height: 16.h),
             ElevatedButton(
@@ -112,6 +128,7 @@ class _EditEventsState extends ConsumerState<EditEvents> {
             SizedBox(height: 24.h),
             ElevatedButton(
               onPressed: () {
+                // Call the updateEvents method based on image type (Web or Mobile)
                 ref.read(eventProvider.notifier).updateEvents(
                       eventId: eventId,
                       event_name: _eventNameController.text.isNotEmpty
@@ -120,7 +137,9 @@ class _EditEventsState extends ConsumerState<EditEvents> {
                       event_date: _eventDateController.text.isNotEmpty
                           ? _eventDateController.text
                           : null,
-                      imageBytes: _imageBytes,
+                      imageBytes: kIsWeb ? _imageBytes : null,
+                      imageFile:
+                          !kIsWeb && _image != null ? File(_image!.path) : null,
                     );
 
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -142,3 +161,4 @@ class _EditEventsState extends ConsumerState<EditEvents> {
     );
   }
 }
+// 

@@ -44,11 +44,11 @@ class _ItscreenState extends ConsumerState<Itscreen> {
       },
     );
 
-    final echan = Image.asset(
-      'images/echan.png',
-      height: 80.h,
-      fit: BoxFit.contain,
-    );
+    // final echan = Image.asset(
+    //   'images/echan.png',
+    //   height: 80.h,
+    //   fit: BoxFit.contain,
+    // );
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(

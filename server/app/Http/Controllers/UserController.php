@@ -48,6 +48,7 @@ class UserController extends Controller
                     'token' => $user->api_token,
                     'user_id' => $user->user_id,
                     'email' => $user->email,
+                    'is_admin'=>$user->is_admin,
                 ], Response::HTTP_OK);
             } else {
                 return response()->json(['error' => 'User not found by ID!'], Response::HTTP_UNAUTHORIZED);
@@ -57,35 +58,6 @@ class UserController extends Controller
         return response()->json(['error' => 'Login failed! Invalid credentials.'], Response::HTTP_UNAUTHORIZED);
     }
 
-
-    // public function signup(Request $req){
-    //     $rules = array(
-    //         'email' => 'required|email|unique:users',
-    //         "password" =>"required|min:6"
-    //     );
-    //     $validator = Validator::make($req->all(),$rules);
-    //     if($validator ->fails())
-    //     {
-    //         return $validator->errors();
-    //     }
-    //     else
-    //     {
-    //         $user = User::create([
-    //             'email' => $req->email,
-    //             'password' => Hash::make($req->password),
-    //             'is_admin' => 0,
-    //         ]);
-    //         $result=$user->save();
-
-    //         if($result){
-    //             return ["result" =>"User registered successfully!"];
-    //         }
-    //         else
-    //         {
-    //             return ["result" =>"operation failed"];
-    //         }
-    //     }
-    // }
     public function signup(Request $req)
 {
     $rules = [
@@ -142,4 +114,6 @@ class UserController extends Controller
 
         return response()->json(['error' => 'User not authenticated.'], 401);
     }
+
+
 }

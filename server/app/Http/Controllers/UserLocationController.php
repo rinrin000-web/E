@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\User;
 use App\Models\Floor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+
+use function Laravel\Prompts\select;
 
 class UserLocationController extends Controller
 {
@@ -14,25 +17,10 @@ class UserLocationController extends Controller
      * @param int $userId
      * @return \Illuminate\Http\Response
      */
-    public function show($email=null)
+    public function show()
     {
-        // $user = User::findOrFail($userId);  // Lấy thông tin người dùng
 
-        // // Nếu người dùng chưa có tầng nào
-        // if (!$user->floor_no) {
-        //     return response()->json([
-        //         'message' => 'User has no floor assigned',
-        //     ], 404);
-        // }
-
-        // // Lấy thông tin tầng của người dùng
-        // $floor = Floor::find($user->floor_no);
-
-        // return response()->json([
-        //     'user' => $user,
-        //     'floor' => $floor
-        // ]);
-        return $email ? User::where('email', $email)->get() : User::all();
+        return User::all();
     }
 
     /**
@@ -77,6 +65,73 @@ class UserLocationController extends Controller
         return response()->json([
             'message' => 'User location updated successfully',
             'user' => $user,
+        ]);
+    }
+
+    public function updateRole(Request $request)
+{
+    if (!$request->has('email')) {
+        return response()->json(['message' => 'Email không được cung cấp'], 400);
+    }
+    $user = User::where('email', $request->email)->first();
+
+    if (!$user) {
+        return response()->json(['message' => 'Người dùng không tồn tại'], 404);
+    }
+
+    $user->is_admin = 1;
+    $user->save(); // Lưu thay đổi vào cơ sở dữ liệu
+
+    return response()->json([
+        'message' => 'Cập nhật quyền thành công',
+        'user' => $user,
+    ]);
+}
+
+    public function deleteRole(Request $request)
+    {
+
+        if (!$request->has('email')) {
+            return response()->json(['message' => 'Email không được cung cấp'], 400);
+        }
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json(['message' => 'Người dùng không tồn tại'], 404);
+        }
+
+        $user->is_admin = 0;
+        $user->save(); // Lưu thay đổi vào cơ sở dữ liệu
+
+        return response()->json([
+            'message' => 'Cập nhật quyền thành công',
+            'user' => $user,
+        ]);
+    }
+    public function searchEmails(Request $request)
+{
+    $keyword = $request->input('keyword');
+
+    // Tìm kiếm email phù hợp
+    $emails = User::where('email', 'like', '%' . $keyword . '%')
+        ->pluck('email'); // Chỉ lấy danh sách email
+
+    return response()->json($emails);
+}
+    public function isAdmin(){
+        $isAdmin = DB::select(
+            "select email from users where is_admin = 1"
+        );
+        return response()->json([
+            'isAdmin' => $isAdmin,
+        ]);
+    }
+    public function isUser(){
+        $isUser = DB::select(
+            "select email from users where is_admin = 0"
+        );
+        return response()->json([
+            'isUser' => $isUser,
         ]);
     }
 }

@@ -2,6 +2,7 @@ import 'package:client/pages/constants.dart';
 import 'package:client/pages/createTeams.dart';
 import 'package:client/pages/search_bar.dart';
 import 'package:client/provider/event_provider.dart';
+import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -32,12 +33,16 @@ class _HomescreenState extends ConsumerState<Homescreen> {
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
     print('eventId: $eventId');
     ref.read(teamListProvider.notifier).fetchTeamsbyId(eventId);
+    // ref.read(userLocationProvider.notifier).fetchUserLocation();
   }
 
   @override
   Widget build(BuildContext context) {
     final teams = ref.watch(teamListProvider);
-    final user = ref.watch(authProvider).commentUser;
+    // final user = ref.watch(authProvider).commentUser;
+    final currentUser =
+        ref.watch(authProvider).commentUser; // Lấy thông tin user hiện tại
+    final isAdmin = ref.watch(authProvider).isAdmin;
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
     final list = ListView.builder(
       itemCount: teams.length,
@@ -72,7 +77,7 @@ class _HomescreenState extends ConsumerState<Homescreen> {
               ),
             ),
             // list,
-            if (user != 'admin@gmail.com')
+            if (!isAdmin!)
               Positioned(
                   bottom: 0,
                   // right: 10,
@@ -86,7 +91,7 @@ class _HomescreenState extends ConsumerState<Homescreen> {
                             width: 10.w,
                           ),
                           CurrentfloorCheck(
-                            user: user,
+                            user: currentUser,
                             eventId: eventId,
                           )
                         ],
@@ -94,7 +99,7 @@ class _HomescreenState extends ConsumerState<Homescreen> {
           ],
         ),
       ),
-      floatingActionButton: user == 'admin@gmail.com'
+      floatingActionButton: isAdmin
           ? FloatingActionButton(
               onPressed: () {},
               child: IconButton(

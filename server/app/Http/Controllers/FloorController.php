@@ -167,26 +167,6 @@ public function store(Request $request, $event_id)
     }
 
 
-
-
-//     public function getFloorTeamCount($event_id)
-// {
-//     $floors = Floor::all(); // Lấy tất cả các tầng
-
-//     foreach ($floors as $floor) {
-//         // Tính số lượng đội cho từng tầng
-//         $teamCount = Team::where('floor_no', $floor->floor_no)
-//             ->whereHas('eventsManage', function ($query) use ($event_id) {
-//                 $query->where('event_id', $event_id); // Lọc theo event_id
-//             })
-//             ->count(); // Đếm số đội
-
-//         $floor->teamcount = $teamCount;
-//         $floor->userCount = $floor->users()->count();
-//     }
-
-//     return response()->json($floors);
-// }
 public function getFloorTeamCount($event_id)
 {
     // Lấy tất cả các tầng có event_id tương ứng

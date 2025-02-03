@@ -7,16 +7,7 @@ use App\Models\Favorite;
 
 class FavoriteController extends Controller
 {
-    // Lấy danh sách các yêu thích của người dùng (theo email)
-    // public function index($user_email = null)
-    // {
-    //     $favorites = $user_email ? Favorite::where('user_email', $user_email)->get() : Favorite::all();
 
-    //     return response()->json([
-    //         'status' => true,
-    //         'data' => $favorites
-    //     ], 200);
-    // }
     public function index($user_email, $event_id)
     {
         $favorites = Favorite::query();
@@ -60,18 +51,6 @@ class FavoriteController extends Controller
                             ->where('team_no', $request->team_no)
                             ->first();
 
-        // if ($favorite) {
-        //     // Nếu đã tồn tại, lật giá trị is_favorite
-        //     $favorite->is_favorite = !$favorite->is_favorite;
-        //     $favorite->favorited_at = $favorite->is_favorite ? now() : null;
-        //     $favorite->save();
-
-        //     return response()->json([
-        //         'status' => true,
-        //         'message' => 'Favorite status updated successfully!',
-        //         'data' => $favorite
-        //     ], 200);
-        // }
         if (!$favorite) {
             // Nếu chưa tồn tại, tạo mới với is_favorite = true
             $favorite = Favorite::create([

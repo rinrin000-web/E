@@ -54,21 +54,7 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
             ),
           );
         },
-        child:
-            // RatingBar.builder(
-            //   itemBuilder: (context, index) => const Icon(
-            //     Icons.star,
-            //     color: Color(0xffFFCC66),
-            //   ),
-            //   onRatingUpdate: (rating) {},
-            //   initialRating: selectedTeam.rank.toDouble(),
-            //   itemCount: 5,
-            //   allowHalfRating: true,
-            //   unratedColor: Colors.blue[100],
-            //   itemSize: 20,
-            //   ignoreGestures: true,
-            // ));
-            TeamRankWidget(
+        child: TeamRankWidget(
           teamNo: selectedTeamNo,
           eventId: eventId,
         ));
@@ -79,7 +65,7 @@ class _MyTeamScreenState extends ConsumerState<MyTeamScreen> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Padding(
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
         child: SingleChildScrollView(
           child: Column(
             children: [

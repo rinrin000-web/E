@@ -46,18 +46,6 @@ class _UpdateTeamsState extends ConsumerState<UpdateTeams> {
     }
   }
 
-  // bool _validateForm() {
-  //   bool isValid = true;
-  //   setState(() {
-  //     _floorNoError =
-  //         _floorController.text.isEmpty ? 'Please enter a floor number' : null;
-  //     _imageError = _image == null ? 'Please select an image' : null;
-
-  //     isValid = _floorNoError == null && _imageError == null;
-  //   });
-  //   return isValid;
-  // }
-
   @override
   Widget build(BuildContext context) {
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
@@ -110,7 +98,8 @@ class _UpdateTeamsState extends ConsumerState<UpdateTeams> {
                         floorNo: _floorController.text.isNotEmpty
                             ? _floorController.text
                             : null,
-                        imageBytes: _imageBytes,
+                        imageBytes:
+                            _imageBytes ?? File(_image!.path).readAsBytesSync(),
                       );
                   ShowSnackBarE.showSnackBar(
                       context, 'Team created successfully!');

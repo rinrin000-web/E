@@ -175,22 +175,6 @@ class TeamNotifier extends StateNotifier<List<TeamList>> {
     }
   }
 
-  // Future<void> searchByTeamNo(String teamNo, int? eventId) async {
-  //   try {
-  //     if (teamNo.isEmpty) {
-  //       await fetchTeamsbyId(eventId);
-  //     } else {
-  //       state = state.where((team) => team.team_no!.contains(teamNo)).toList();
-
-  //       if (state.isEmpty) {
-  //         await fetchTeamsbyId(eventId);
-  //         state = state.where((team) => team.team_no == teamNo).toList();
-  //       }
-  //     }
-  //   } catch (e) {
-  //     print('Error searching by team_no: $e');
-  //   }
-  // }
   Future<void> searchByTeamNo(String teamNo, int? eventId) async {
     try {
       if (teamNo.isEmpty) {
@@ -262,18 +246,3 @@ final teamListProvider =
     StateNotifierProvider<TeamNotifier, List<TeamList>>((ref) {
   return TeamNotifier(ref);
 });
-
-// final rankStreamProvider =
-//     StreamProvider.family<TeamList?, String?>((ref, teamNo) {
-//   return Stream.periodic(const Duration(seconds: 10), (_) async {
-//     final response = await http
-//         .get(Uri.parse('http://127.0.0.1:8000/api/teams/getRank/$teamNo'));
-
-//     if (response.statusCode == 200) {
-//       final data = json.decode(response.body);
-//       return TeamList.fromJson(data);
-//     } else {
-//       throw Exception('Failed to load team rank');
-//     }
-//   }).asyncMap((event) => event); // Chuyển đổi sang stream
-// });

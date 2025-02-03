@@ -8,12 +8,16 @@ import 'dart:convert';
 class User {
   final String? email;
   final String? floor_no;
+  final int? isAdmin;
 
-  User({this.email, this.floor_no});
+  User({this.email, this.floor_no, this.isAdmin});
   factory User.fromJson(Map<String, dynamic> json) {
     return User(
       email: json['email'],
       floor_no: json['floor_no'].toString(),
+      isAdmin: json['is_admin'] != null
+          ? int.tryParse(json['is_admin'].toString()) ?? 0
+          : 0,
     );
   }
 }
@@ -23,15 +27,46 @@ class UserLocationNotifier extends StateNotifier<List<User>> {
 
   final String baseUrl = '${BaseUrlE.baseUrl}/api/user/location';
 
-  Future<void> fetchUserLocation(String? email) async {
-    final response = await http.get(Uri.parse('$baseUrl/$email'));
+  Future<void> fetchUserLocation() async {
+    final response = await http.get(Uri.parse('$baseUrl'));
 
     if (response.statusCode == 200) {
       List<dynamic> body = json.decode(response.body);
       state = body.map((json) => User.fromJson(json)).toList();
-      print(state);
+      try {
+        var data = jsonDecode(response.body);
+        if (data['message'] is String) {
+          print('Message: ${data['message']}');
+        } else {
+          print('Unexpected message format');
+        }
+      } catch (e) {
+        print('Error parsing message: $e');
+      }
     } else {
       throw Exception('Failed to load floor');
+    }
+  }
+
+  Future<List<User>> fetchAdmin() async {
+    final response = await http.get(Uri.parse('$baseUrl/isAdmin'));
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body)['isAdmin'];
+      return data.map<User>((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load admins');
+    }
+  }
+
+  Future<List<User>> fetchUser() async {
+    final response = await http.get(Uri.parse('$baseUrl/isUser'));
+
+    if (response.statusCode == 200) {
+      var data = jsonDecode(response.body)['isUser'];
+      return data.map<User>((json) => User.fromJson(json)).toList();
+    } else {
+      throw Exception('Failed to load users');
     }
   }
 
@@ -75,6 +110,83 @@ class UserLocationNotifier extends StateNotifier<List<User>> {
       print('User location cleared for $email');
     } else {
       throw Exception('Failed to clear user location');
+    }
+  }
+
+  Future<void> updateRole(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${baseUrl}/updateRole'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({
+          'email': email,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Nếu thành công, trả về thông tin người dùng
+        var data = jsonDecode(response.body);
+        print(data['message']);
+      } else {
+        // Xử lý lỗi nếu có
+        var data = jsonDecode(response.body);
+        print("Error: ${data['message']}");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<void> deleteRole(String email) async {
+    try {
+      final response = await http.post(
+        Uri.parse('${baseUrl}/deleteRole'),
+        headers: {'Content-Type': 'application/json; charset=UTF-8'},
+        body: jsonEncode({
+          'email': email,
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        // Nếu thành công, trả về thông tin người dùng
+        var data = jsonDecode(response.body);
+        print(data['message']);
+      } else {
+        // Xử lý lỗi nếu có
+        var data = jsonDecode(response.body);
+        print("Error: ${data['message']}");
+      }
+    } catch (e) {
+      print("Error: $e");
+    }
+  }
+
+  Future<void> fetchSuggestions(String keyword) async {
+    if (keyword.isEmpty) {
+      state = []; // Xóa danh sách nếu không có từ khóa
+      return;
+    }
+
+    final url = Uri.parse('${baseUrl}/searchEmails');
+    try {
+      final response = await http.post(
+        url,
+        body: json.encode({'keyword': keyword}),
+        headers: {'Content-Type': 'application/json'},
+      );
+
+      if (response.statusCode == 200) {
+        // Giải mã và kiểm tra cấu trúc dữ liệu trả về
+        final List<dynamic> data = json.decode(response.body);
+
+        // Nếu dữ liệu là một danh sách email thuần túy, bạn chỉ cần ánh xạ qua String
+        state = data.map((e) => User(email: e)).toList();
+      } else {
+        state = [];
+        print("Error: Không tìm thấy email phù hợp.");
+      }
+    } catch (e) {
+      print("Error khi gọi API: $e");
     }
   }
 }

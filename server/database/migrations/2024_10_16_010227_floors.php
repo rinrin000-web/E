@@ -24,8 +24,8 @@ return new class extends Migration
 
             // Thêm khóa ngoại với bảng eventsmanage
             $table->foreign('event_id')
-                  ->references('event_id')
-                  ->on('eventsmanage')
+                  ->references('id')
+                  ->on('events')
                   ->onDelete('cascade') // Xóa dòng khi sự kiện bị xóa
                   ->onUpdate('cascade'); // Cập nhật khi sự kiện bị thay đổi
         });

@@ -23,7 +23,7 @@ class _CurrentfloorCheckState extends ConsumerState<CurrentfloorCheck> {
     super.initState();
     final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
     ref.read(floorProvider.notifier).fetchFloor(eventId!);
-    ref.read(userLocationProvider.notifier).fetchUserLocation(widget.user);
+    ref.read(userLocationProvider.notifier).fetchUserLocation();
   }
 
   void onFloorTap(String floorNo) async {

@@ -65,29 +65,6 @@ class FloorNotifier extends StateNotifier<List<Floor>> {
     }
   }
 
-  // Future<Floor> createFloor(String floor_no, String contents) async {
-  //   try {
-  //     final response = await http.post(
-  //       Uri.parse('$baseUrl'),
-  //       headers: {'Content-Type': 'application/json'},
-  //       body: json.encode({
-  //         'floor_no': floor_no,
-  //         'contents': contents,
-  //       }),
-  //     );
-  //     if (response.statusCode == 201) {
-  //       // List<dynamic> body = json.decode(response.body);
-  //       // state = body.map((json) => Floor.fromJson(json)).toList();
-  //       return Floor.fromJson(json.decode(response.body));
-  //     } else {
-  //       throw Exception('Failed to create floor');
-  //     }
-  //   } catch (e) {
-  //     print('Error occurred: $e');
-  //     throw Exception('Failed to load floor');
-  //   }
-  // }
-
   Future<void> createFloor(int eventId, String floorNo, String contents) async {
     final url = Uri.parse('${baseUrl}/$eventId');
     final response = await http.post(

@@ -10,6 +10,7 @@ class AuthState {
   final bool isAuthenticated;
   final bool? isLogin;
   final bool? isSignup;
+  final bool? isAdmin;
   final String? errorMessage;
   final String? commentUser;
 
@@ -17,6 +18,7 @@ class AuthState {
       {this.isAuthenticated = false,
       this.isLogin = false,
       this.isSignup = false,
+      this.isAdmin,
       this.errorMessage,
       this.commentUser});
 }
@@ -37,72 +39,82 @@ class AuthNotifier extends StateNotifier<AuthState> {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final commentUser = prefs.getString('commentUser');
+    final isAdmin = prefs.getBool('isAdmin');
     if (token != null) {
-      state = AuthState(isAuthenticated: true, commentUser: commentUser);
-    } else {
       state = AuthState(
-          isAuthenticated:
-              false); // Thêm dòng này để đảm bảo trạng thái xác thực
+          isAuthenticated: true, commentUser: commentUser, isAdmin: isAdmin);
+    } else {
+      state = AuthState(isAuthenticated: false); // Đảm bảo trạng thái xác thực
     }
   }
 
   // Hàm đăng nhập
   Future<void> login(String email, String password) async {
     // state = AuthState(isLogin: true, isSignup: false);
-    if (email.isEmpty) {
-      state = AuthState(
-          isAuthenticated: false,
-          isLogin: true,
-          isSignup: false,
-          errorMessage: ErrorMessages.emailRequired);
-      throw Exception(ErrorMessages.emailRequired);
-    }
-
-    if (password.isEmpty) {
-      state = AuthState(
-          isAuthenticated: false,
-          isLogin: true,
-          isSignup: false,
-          errorMessage: ErrorMessages.passwordRequired);
-      throw Exception(ErrorMessages.passwordRequired);
-    }
-    final response = await http.post(
-      Uri.parse('${BaseUrlE.baseUrl}/api/login'),
-      headers: {'Content-Type': 'application/json'},
-      body: json.encode({'email': email, 'password': password}),
-    );
-
-    if (response.statusCode == 200) {
-      final responseBody = json.decode(response.body);
-      final token = responseBody['token'];
-      final commentUser = responseBody['email'];
-
-      if (token == null) {
-        throw Exception('Login failed: ${responseBody}');
-      } else {
-        // Lưu token vào SharedPreferences
-        final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', token);
-        await prefs.setString('commentUser', commentUser);
-        // Cập nhật trạng thái sau khi đăng nhập thành công
+    try {
+      if (email.isEmpty) {
         state = AuthState(
+            isAuthenticated: false,
+            isLogin: true,
+            isSignup: false,
+            errorMessage: ErrorMessages.emailRequired);
+        throw Exception(ErrorMessages.emailRequired);
+      }
+
+      if (password.isEmpty) {
+        state = AuthState(
+            isAuthenticated: false,
+            isLogin: true,
+            isSignup: false,
+            errorMessage: ErrorMessages.passwordRequired);
+        throw Exception(ErrorMessages.passwordRequired);
+      }
+      final response = await http.post(
+        Uri.parse('${BaseUrlE.baseUrl}/api/login'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'email': email, 'password': password}),
+      );
+
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        final token = responseBody['token'];
+        final commentUser = responseBody['email'];
+        final isAdmin = responseBody['is_admin'] == 1 ? true : false;
+
+        print('response: $responseBody');
+        print('admin la : $isAdmin');
+        if (token == null) {
+          throw Exception('Login failed: ${responseBody}');
+        } else {
+          // Lưu token vào SharedPreferences
+          final prefs = await SharedPreferences.getInstance();
+          await prefs.setString('token', token);
+          await prefs.setString('commentUser', commentUser);
+          await prefs.setBool('isAdmin', isAdmin);
+
+          state = AuthState(
             isAuthenticated: true,
             isLogin: true,
             isSignup: false,
             errorMessage: null,
-            commentUser: commentUser);
-        print("Người đăng nhập: $commentUser");
+            commentUser: commentUser,
+            isAdmin: isAdmin,
+          );
+          print("Người đăng nhập: $commentUser");
+        }
+      } else {
+        state = AuthState(
+          isAuthenticated: false,
+          isLogin: true,
+          isSignup: false,
+          errorMessage: 'メールアドレスまたはパスワードを確認してください',
+        );
+        print('Status Code: ${response.statusCode}');
+        print('Response Body: ${response.body}');
+        throw Exception('Failed to login: ${response.body}');
       }
-    } else {
-      state = AuthState(
-        isAuthenticated: false,
-        isLogin: true,
-        isSignup: false,
-        errorMessage: 'メールアドレスまたはパスワードを確認してください',
-      );
-      print('Status Code: ${response.statusCode}');
-      print('Response Body: ${response.body}');
-      throw Exception('Failed to login: ${response.body}');
+    } catch (e) {
+      print('Error: $e');
     }
   }
 
@@ -173,48 +185,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     await prefs.remove('token');
     await prefs.remove('commentUser');
   }
-
-  // Future<http.Response> getUserResetPassword(String email) async {
-  //   final prefs = await SharedPreferences.getInstance();
-  //   final token = prefs.getString('token');
-  //   final pemail = prefs.getString('email');
-
-  //   Map<String, dynamic> data = {
-  //     "email": email,
-  //   };
-
-  //   var body = json.encode(data);
-  //   var url = Uri.parse('http://127.0.0.1:8000/api/password/reset');
-  //   var response = await http.post(
-  //     url,
-  //     headers: {
-  //       'Accept': 'application/json',
-  //       'Authorization': 'Bearer $token',
-  //       'Content-Type': 'application/json',
-  //     },
-  //     body: body,
-  //   );
-
-  //   return response;
-  // }
-
-  // Future<void> resetPassword(String email) async {
-  //   if (email.isEmpty) {
-  //     print('Email không được để trống');
-  //     return;
-  //   }
-
-  //   try {
-  //     var response = await getUserResetPassword(email);
-  //     if (response.statusCode == 200) {
-  //       print('Password reset link sent successfully.');
-  //     } else {
-  //       print('Failed to send reset link.');
-  //     }
-  //   } catch (e) {
-  //     print('Error occurred: $e');
-  //   }
-  // }
 
   Future<void> forgotPassword(String email) async {
     final url = Uri.parse('${BaseUrlE.baseUrl}/api/password/reset');

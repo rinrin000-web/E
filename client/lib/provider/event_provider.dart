@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:client/pages/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -97,6 +99,7 @@ class EventsNotifier extends StateNotifier<List<Event>> {
     String? event_name,
     String? event_date,
     Uint8List? imageBytes,
+    File? imageFile,
   }) async {
     try {
       var request =
@@ -108,13 +111,27 @@ class EventsNotifier extends StateNotifier<List<Event>> {
       if (event_date?.isNotEmpty ?? false) {
         request.fields['event_date'] = event_date!;
       }
-      if (imageBytes != null) {
+
+      // Handle image upload (Web or Mobile)
+      if (imageBytes != null && imageBytes.isNotEmpty) {
+        print('Image data length: ${imageBytes.length}');
         request.files.add(http.MultipartFile.fromBytes(
           'images',
           imageBytes,
           filename: 'event_image.jpg',
         ));
+      } else if (imageFile != null) {
+        print('Uploading image file: ${imageFile.path}');
+        request.files.add(http.MultipartFile(
+          'images',
+          imageFile.readAsBytes().asStream(),
+          imageFile.lengthSync(),
+          filename: imageFile.path.split('/').last,
+        ));
+      } else {
+        print('No image to upload');
       }
+
       var response = await request.send();
 
       if (response.statusCode == 200) {

@@ -45,11 +45,11 @@ class _WebScreenState extends ConsumerState<WebScreen> {
       },
     );
 
-    final echan = Image.asset(
-      'images/echan.png',
-      height: 80.h,
-      fit: BoxFit.contain,
-    );
+    // final echan = Image.asset(
+    //   'images/echan.png',
+    //   height: 80.h,
+    //   fit: BoxFit.contain,
+    // );
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: Container(
@@ -60,23 +60,6 @@ class _WebScreenState extends ConsumerState<WebScreen> {
           // mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Row(
-            //   children: [
-            //     // const Text(
-            //     //   'WEB系',
-            //     //   style: TextStyle(
-            //     //     fontWeight: FontWeight.bold,
-            //     //     fontSize: 29,
-            //     //   ),
-            //     // ),
-            //     // const SizedBox(
-            //     //   width: 10,
-            //     // ),
-            //     Text(
-            //       '( ${filteredTeams.length} ) ',
-            //     ),
-            //   ],
-            // ),
             Searchbar(eventId: eventId),
             SizedBox(
               height: 10.h,

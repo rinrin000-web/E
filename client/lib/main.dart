@@ -1,5 +1,6 @@
-import 'package:client/ForgotPassword.dart';
 import 'package:client/LoginScreen.dart';
+import 'package:client/pages/AddAdmin.dart';
+import 'package:client/pages/DeleteAdmin.dart';
 import 'package:client/pages/EditEvents.dart';
 import 'package:client/pages/EventScreen.dart';
 import 'package:client/pages/FloorGuide.dart';
@@ -7,6 +8,7 @@ import 'package:client/pages/FloorGuideEdit.dart';
 import 'package:client/pages/HistoryScreen.dart';
 import 'package:client/pages/HomeScreen.dart';
 import 'package:client/pages/ItScreen.dart';
+import 'package:client/pages/MemberManage.dart';
 import 'package:client/pages/MyHome.dart';
 import 'package:client/pages/MyTeamScreen.dart';
 import 'package:client/pages/NewEventSetting.dart';
@@ -16,7 +18,6 @@ import 'package:client/pages/T_overviewEdit.dart';
 import 'package:client/pages/UpdateTeams.dart';
 import 'package:client/pages/WebScreen.dart';
 import 'package:client/pages/createTeams.dart';
-import 'package:client/pages/main_home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -125,6 +126,18 @@ class MyApp extends ConsumerWidget {
                     GoRoute(
                       path: 'floorEdit',
                       builder: (context, state) => FloorGuideEdit(),
+                    ),
+                    GoRoute(
+                      path: 'member_manage',
+                      builder: (context, state) => MemberManage(),
+                    ),
+                    GoRoute(
+                      path: 'add_admin',
+                      builder: (context, state) => AddAdmin(),
+                    ),
+                    GoRoute(
+                      path: 'delete_admin',
+                      builder: (context, state) => DeleteAdmin(),
                     ),
                   ],
                 ),

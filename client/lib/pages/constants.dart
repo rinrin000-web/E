@@ -25,8 +25,8 @@ class Efont {
 }
 
 class BaseUrlE {
-  // static const String baseUrl = 'http://127.0.0.1:8000';
-  static const String baseUrl = 'http://192.168.56.1:8000';
+  static const String baseUrl = 'http://127.0.0.1:8000';
+  // static const String baseUrl = 'http://10.65.10.70:8000';
 }
 
 // php artisan serve --host=0.0.0.0 --port=8000
@@ -38,7 +38,7 @@ class ShowSnackBarE {
         content: Row(
           children: [
             Image.asset(
-              'images/echan.png',
+              'assets/images/echan.png',
               width: 50,
               height: 50,
             ),

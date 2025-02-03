@@ -35,10 +35,17 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
     final memberImagesList = ref.watch(memberImagesProvider); // Ảnh từ API
 
     // Kết hợp ảnh từ API và ảnh mới
+    // final combinedImages = [
+    //   ...memberImagesList.map((img) => img.memberfileimages),
+    //   ..._newImages?.map((img) => kIsWeb ? null : img.path) ?? [],
+    // ];
     final combinedImages = [
-      ...memberImagesList.map((img) => img.memberfileimages),
-      ..._newImages?.map((img) => kIsWeb ? null : img.path) ?? [],
+      ...memberImagesList.map((img) => img.memberfileimages), // Ảnh từ API
+      ..._newImages?.map((img) => kIsWeb ? null : img.path) ??
+          [], // Ảnh mới từ mobile nếu không phải web
+      ..._newImageBytesList, // Ảnh mới từ web (dùng bytes)
     ];
+
     Future<void> _pickImage(int index, bool isApiImage) async {
       final picker = ImagePicker();
       final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -63,11 +70,11 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
             } else if (index >= 0) {
               final localIndex = index - memberImagesList.length;
               if (localIndex >= 0 && localIndex < _newImageBytesList.length) {
-                _newImages![localIndex] = pickedFile;
+                // _newImages![localIndex] = pickedFile;
                 _newImageBytesList[localIndex] = imageBytes;
               }
             } else {
-              _newImages?.add(pickedFile);
+              // _newImages?.add(pickedFile);
               _newImageBytesList.add(imageBytes);
             }
           });
@@ -146,20 +153,44 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 10.0),
-                        child: kIsWeb && !isApiImage
-                            ? Image.memory(
-                                _newImageBytesList[
-                                    index - memberImagesList.length],
+                        child: isApiImage
+                            ? Image.network(
+                                memberImagesList[index].memberfileimages,
                                 width: 1.sw,
                                 height: 250.h,
                                 fit: BoxFit.contain,
                               )
-                            : Image.network(
-                                imageUrl ?? '',
-                                width: 1.sw,
-                                height: 250.h,
-                                fit: BoxFit.contain,
-                              ),
+                            : (kIsWeb && !isApiImage
+                                ? Image.memory(
+                                    _newImageBytesList.isNotEmpty &&
+                                            (index - memberImagesList.length) <
+                                                _newImageBytesList.length
+                                        ? _newImageBytesList[
+                                            index - memberImagesList.length]
+                                        : Uint8List(
+                                            0), // Tránh lỗi khi không có ảnh
+                                    width: 1.sw,
+                                    height: 250.h,
+                                    fit: BoxFit.contain,
+                                  )
+                                : (!kIsWeb && !isApiImage)
+                                    ? Image.file(
+                                        File(
+                                          _newImages != null &&
+                                                  (index -
+                                                          memberImagesList
+                                                              .length) <
+                                                      _newImages!.length
+                                              ? _newImages![index -
+                                                      memberImagesList.length]
+                                                  .path
+                                              : '',
+                                        ),
+                                        width: 1.sw,
+                                        height: 250.h,
+                                        fit: BoxFit.contain,
+                                      )
+                                    : const SizedBox()), // Trường hợp không thỏa điều kiện nào, trả về widget trống
                       ),
                     ],
                   );
@@ -169,13 +200,22 @@ class _PRIUpdateState extends ConsumerState<PRIUpdate> {
             ElevatedButton(
               onPressed: () {
                 try {
-                  if (_newImageBytesList.isNotEmpty) {
+                  if (kIsWeb) {
                     ref.read(memberImagesProvider.notifier).updateImages(
                           teamNo,
                           _newImageBytesList,
                         );
-                    ShowSnackBarE.showSnackBar(context, '更新しました');
+                  } else {
+                    List<Uint8List> byteImages = _newImages!.map((file) {
+                      return File(file.path).readAsBytesSync();
+                    }).toList();
+
+                    ref.read(memberImagesProvider.notifier).updateImages(
+                          teamNo,
+                          byteImages, // Pass the bytes for mobile/desktop
+                        );
                   }
+                  ShowSnackBarE.showSnackBar(context, '更新しました');
                 } catch (e) {
                   ShowSnackBarE.showSnackBar(context, 'Error: $e');
                 }

@@ -91,43 +91,6 @@ if ($request->floor_no && !$validFloor) {
     ], 201);
 }
 
-// public function updateTeamImage(Request $request, $team_no)
-// {
-//     $request->validate([
-//         'teamfileimages' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // Xác thực file ảnh
-//     ]);
-
-//     if ($request->hasFile('teamfileimages')) {
-//         $file = $request->file('teamfileimages');
-//         $fileName = 'team_' . time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-
-//         // Lưu file vào thư mục public storage
-//         $filePath = $file->storeAs('teamfileimages', $fileName, 'public');
-
-//         // Tìm team theo team_no
-//         $team = Team::where('team_no', $team_no)->first();
-
-//         if (!$team) {
-//             return response()->json(['message' => 'Team not found'], 404);
-//         }
-
-//         // Xóa ảnh cũ (nếu có)
-//         if ($team->teamfileimages) {
-//             Storage::disk('public')->delete($team->teamfileimages);
-//         }
-
-//         // Cập nhật cột teamfileimages
-//         $team->update(['teamfileimages' => $filePath]);
-
-//         return response()->json([
-//             'message' => 'Image updated successfully',
-//             'team' => $team,
-//         ], 200);
-//     } else {
-//         return response()->json(['message' => 'No image uploaded'], 400);
-//     }
-// }
-
 public function update(Request $request,$event_id, $team_no)
 {
     $request->validate([

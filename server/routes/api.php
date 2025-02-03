@@ -33,6 +33,7 @@ Route::get('login', [UserController::class, 'login'])->name('login');
 Route::post('signup', [UserController::class, 'signup']);
 Route::get('signup', [UserController::class, 'signup']);
 Route::get('logout', [UserController::class, 'logout']);
+
 // routes/api.php
 // Route::post('/password/reset', 'Auth\ResetPasswordController@resetApp');
 Route::post('/password/reset', [ResetPasswordController::class, 'resetApp'])->name('password.reset');
@@ -66,6 +67,8 @@ Route::middleware('auth:api')->group(function(){
     });
 });
 Route::get('/user/user', [UserController::class, 'index']);
+// Route::post('/user/updateRole/{email}', [UserController::class, 'updateRole']);
+// Route::post('/user/deleteRole/{email}', [UserController::class, 'deleteRole']);
 
 
 Route::prefix('teams')->group(function () {
@@ -88,15 +91,20 @@ Route::prefix('floors')->group(function () {
     Route::get('/getFloorTeamCount/{event_id}', [FloorController::class, 'getFloorTeamCount']);
 
 });
-
-Route::get('/user/location/{email?}', [UserLocationController::class, 'show']);
-Route::put('/user/location/{email}', [UserLocationController::class, 'update']);
-
+Route::prefix('/user/location')->group(function () {
+Route::get('/', [UserLocationController::class, 'show']);
+Route::get('/isAdmin', [UserLocationController::class, 'isAdmin']);
+Route::get('/isUser', [UserLocationController::class, 'isUser']);
+Route::post('/searchEmails', [UserLocationController::class, 'searchEmails']);
+Route::put('/{email}', [UserLocationController::class, 'update']);
+Route::post('/updateRole', [UserLocationController::class, 'updateRole']);
+Route::post('/deleteRole', [UserLocationController::class, 'deleteRole']);
+});
 Route::prefix('memberfileimages')->group(function () {
     Route::get('{team_no?}', [MemberimagesController::class, 'index']);
     Route::delete('/{id}', [MemberimagesController::class, 'destroy']);
     Route::post('/update-image/{team_no}', [MemberimagesController::class, 'updateTeamImage']);
-    Route::post('{id}', [MemberimagesController::class, 'update']);
+    Route::post('/{id}', [MemberimagesController::class, 'update']);
     Route::get('/memberfileimages/{filename}', [MemberimagesController::class, 'getImage']);
 });
 

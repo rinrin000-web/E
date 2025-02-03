@@ -3,6 +3,7 @@ import 'package:client/pages/constants.dart';
 import 'package:client/provider/auth_provider.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/favorite_provider.dart';
+import 'package:client/provider/user_location_provider.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert'; // Dùng để parse JSON
@@ -70,7 +71,10 @@ class TeamRankWidget extends ConsumerWidget {
 
 // モデル => ウィジェット に変換する
 Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
-  final user = ref.read(authProvider).commentUser;
+  // final user = ref.read(authProvider).commentUser;
+  final currentUser =
+      ref.watch(authProvider).commentUser; // Lấy thông tin user hiện tại
+  final isAdmin = ref.watch(authProvider).isAdmin;
   final eventId = ref.read(eventProvider.notifier).getSelectedEventIdSync();
   print("evenId : ${eventId}");
   final text = Text('${team.floor}');
@@ -113,7 +117,7 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
               ),
               Row(
                 children: [
-                  user == 'admin@gmail.com'
+                  isAdmin!
                       ? IconButton(
                           icon: Icon(
                             Icons.edit,
@@ -131,7 +135,7 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
                           },
                         )
                       : SizedBox.shrink(),
-                  user == 'admin@gmail.com'
+                  isAdmin
                       ? IconButton(
                           icon: Icon(
                             Icons.delete_outlined,
@@ -143,12 +147,12 @@ Widget modelToWidget(BuildContext context, WidgetRef ref, TeamList team) {
                                 .deleteTeams(team.team_no);
                             ref
                                 .read(favoriteProvider.notifier)
-                                .deleteFavorite(user, team.team_no);
+                                .deleteFavorite(currentUser, team.team_no);
                           },
                         )
                       : SizedBox.shrink(),
                   TeamFavoriteWidget(
-                    userEmail: user,
+                    userEmail: currentUser,
                     teamNo: team.team_no,
                     eventId: eventId,
                   ),

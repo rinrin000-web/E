@@ -1,4 +1,5 @@
 import 'package:client/LoginScreen.dart';
+import 'package:client/pages/constants.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
@@ -79,7 +80,7 @@ class _NewEventSettingState extends State<NewEventSetting> {
       return;
     }
 
-    final uri = Uri.parse('http://127.0.0.1:8000/api/events');
+    final uri = Uri.parse('${BaseUrlE.baseUrl}/api/events');
 
     var request = http.MultipartRequest('POST', uri)
       ..fields['event_name'] = _eventNameController.text

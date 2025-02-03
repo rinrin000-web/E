@@ -15,6 +15,7 @@ class Comment {
   final int? design;
   final int? tech;
   final String? comment;
+  final bool? ispublic;
   final String? commented_at;
 
   Comment(
@@ -28,6 +29,7 @@ class Comment {
       this.design,
       this.tech,
       this.comment,
+      this.ispublic,
       this.commented_at});
   factory Comment.fromJson(Map<String, dynamic> json) {
     return Comment(
@@ -39,6 +41,7 @@ class Comment {
       design: json['design'],
       tech: json['tech'],
       comment: json['comment'],
+      ispublic: json[' ispublic'],
       commented_at: json['commented_at'],
     );
   }
@@ -117,6 +120,22 @@ class CommentNotifier extends StateNotifier<List<Comment>> {
       return Comment.fromJson(json.decode(response.body));
     } else {
       throw Exception('Failed to create comment');
+    }
+  }
+
+  Future<void> updateIsPublic(String? commentUser, bool ispublic) async {
+    final response = await http.post(
+      Uri.parse('$baseUrl/updateIsPublic/$commentUser'),
+      headers: {'Content-Type': 'application/json'},
+      body: json.encode({
+        'ispublic': ispublic,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      print('Updated isPublic: $ispublic');
+    } else {
+      print('Error updating isPublic: ${response.body}');
     }
   }
 }

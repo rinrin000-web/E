@@ -17,7 +17,8 @@ class Comment extends Model
         'plan',
         'design',
         'tech',
-        'comment'
+        'comment',
+        'ispublic'
     ];
     use HasFactory;
     public function team()

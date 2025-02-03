@@ -1,5 +1,6 @@
 import 'package:client/LoginScreen.dart';
 import 'package:client/provider/auth_provider.dart';
+import 'package:client/provider/comment_provider.dart';
 import 'package:client/provider/event_provider.dart';
 import 'package:client/provider/fake_usercount_provider.dart';
 import 'package:client/provider/floor_provider.dart';
@@ -34,8 +35,7 @@ class MyhomeState extends ConsumerState<Myhome> {
   Widget build(BuildContext context) {
     final selectedIndex = ref.watch(tabIndexProvider);
     final eventId = ref.watch(eventProvider.notifier).getSelectedEventIdSync();
-    final currentUser =
-        ref.watch(authProvider).commentUser; // Lấy thông tin user hiện tại
+    final currentUser = ref.watch(authProvider).commentUser;
 
     final isAdmin = ref.watch(authProvider).isAdmin;
 
@@ -118,6 +118,9 @@ class MyhomeState extends ConsumerState<Myhome> {
                     ref
                         .read(emailVisibilityProvider.notifier)
                         .toggleVisibility();
+                    ref
+                        .read(commentProvider.notifier)
+                        .updateIsPublic(currentUser, !isPublic);
                   },
                 ),
               ],

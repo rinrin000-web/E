@@ -124,6 +124,7 @@ Route::prefix('comments')->group(function () {
 
     // Cập nhật comment theo team_no và id của comment
     Route::put('/{team_no}/{comment_user}', [CommentController::class, 'update']);
+    Route::post('/updateIsPublic/{comment_user}', [CommentController::class, 'updateIsPublic']);
 
     // Xóa comment theo team_no và id của comment
     Route::delete('/{team_no}/{comment_user}', [CommentController::class, 'destroy']);

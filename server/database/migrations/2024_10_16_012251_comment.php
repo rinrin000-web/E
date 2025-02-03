@@ -23,7 +23,8 @@ return new class extends Migration
             $table->integer('design')->nullable();
             $table->integer('tech')->nullable();
 
-            $table->text('comment')->nullable(); // Trường comment
+            $table->text('comment')->nullable();
+            $table->boolean('ispublic')->default(1)->after('comment');
 
             // Định nghĩa khoá ngoại
             $table->foreign('team_no')->references('team_no')->on('teams')->onDelete('cascade');

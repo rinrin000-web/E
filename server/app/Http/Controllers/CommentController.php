@@ -8,10 +8,26 @@ use App\Models\Comment;
 class CommentController extends Controller
 {
      //一覧取得
+    // public function index($team_no = null)
+    // {
+    //     return $team_no ? Comment::where('team_no', $team_no)->get() : Comment::all();
+    // }
     public function index($team_no = null)
-    {
-        return $team_no ? Comment::where('team_no', $team_no)->get() : Comment::all();
+{
+    $comments = $team_no
+        ? Comment::where('team_no', $team_no)->get()
+        : Comment::all();
+
+    // Lặp qua các comment để điều chỉnh comment_user khi ispublic là 0
+    foreach ($comments as $comment) {
+        if ($comment->ispublic == 0) {
+            $comment->comment_user = 'Euser';  // Đặt comment_user thành 'Euser'
+        }
     }
+
+    return response()->json($comments);
+}
+
 
 
      //新規作成
@@ -43,21 +59,28 @@ class CommentController extends Controller
      //1件取得
 
         // 1件取得
-    public function show($team_no,$comment_user)
-    {
-        // Lấy tất cả bình luận của người dùng cho team_no cụ thể
-        $comments = Comment::where('comment_user', $comment_user)
-                            ->where('team_no', $team_no)
-                            ->get();
+        public function show($team_no, $comment_user)
+        {
+            // Lấy tất cả bình luận của người dùng cho team_no cụ thể
+            $comments = Comment::where('comment_user', $comment_user)
+                                ->where('team_no', $team_no)
+                                ->get();
 
-        if ($comments->isEmpty()) {
+            if ($comments->isEmpty()) {
+                return response()->json(['message' => 'You have not rated this team yet. Please submit your comment.'], 404);
+            }
 
-            return response()->json(['message' => 'You have not rated this team yet. Please submit your comment.'], 404);
+            // Kiểm tra và thay đổi giá trị comment_user nếu ispublic là 0
+            $comments->transform(function ($comment) {
+                if ($comment->ispublic == 0) {
+                    $comment->comment_user = "Euser";
+                }
+                return $comment;
+            });
+
+            return response()->json($comments, 200);
         }
 
-
-        return response()->json($comments, 200);
-    }
     public function getHistory(Request $request, $user)
 {
     $comments = Comment::where('comment_user', $user)
@@ -95,7 +118,7 @@ class CommentController extends Controller
             'plan' => 'nullable|integer',
             'design' => 'nullable|integer',
             'tech' => 'nullable|integer',
-            'comment' => 'nullable|string|max:1000'
+            'comment' => 'nullable|string|max:1000',
         ]);
 
         $comment->fill($validatedData);
@@ -119,5 +142,27 @@ class CommentController extends Controller
         }
         return response()->json(['message' => 'Comment deleted successfully'], 200);
       }
+
+      public function updateIsPublic(Request $request, $comment_user)
+{
+    $comments = Comment::where('comment_user', $comment_user)->get();
+
+    if ($comments->isEmpty()) {
+        return response()->json(['message' => 'No comments found for this user'], 404);
+    }
+
+
+    $validatedData = $request->validate([
+        'ispublic' => 'required|boolean', // Chỉ nhận giá trị 0 hoặc 1
+    ]);
+
+
+    foreach ($comments as $comment) {
+        $comment->update(['ispublic' => $validatedData['ispublic']]);
+    }
+
+    return response()->json(['message' => 'Updated successfully', 'comment' => $comment], 200);
+}
+
 
 }
